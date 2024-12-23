@@ -15,27 +15,22 @@
           "uploadDebugSymbols": false,
           "fileOutput": "ios/Runner/GoogleService-Info.plist"
         }
-      },
-      "macos": {
-        "default": {
-          "projectId": "schoolapp-feed2",
-          "appId": "1:295450309393:ios:0a5a442b4c73cb750012b0",
-          "uploadDebugSymbols": false,
-          "fileOutput": "macos/Runner/GoogleService-Info.plist"
-        }
-      },
-      "dart": {
-        "lib/firebase_options.dart": {
-          "projectId": "schoolapp-feed2",
-          "configurations": {
-            "android": "1:295450309393:android:9be2271f0f1824c60012b0",
-            "ios": "1:295450309393:ios:0a5a442b4c73cb750012b0",
-            "macos": "1:295450309393:ios:0a5a442b4c73cb750012b0",
-            "web": "1:295450309393:web:5a0cf7af971559fc0012b0",
-            "windows": "1:295450309393:web:6f2068839e037ef50012b0"
-          }
-        }
       }
     }
+  },
+  "hosting": {
+    "site": "dunbeholden-fc",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }

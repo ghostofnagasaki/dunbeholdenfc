@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants.dart/colors.dart';
+import '../constants/colors.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});

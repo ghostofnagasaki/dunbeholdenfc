@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../constants.dart/colors.dart';
-import '../screens/about_screen.dart';
+import '../constants/colors.dart';
 import '../screens/home_screen.dart';
-import '../screens/settings_screen.dart';
 import '../screens/shop_screen.dart';
+import '../screens/matches_screen.dart';
+import '../screens/mydbn_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -18,9 +18,9 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
+    // const MatchesScreen(),
     const ShopScreen(),
-    const AboutScreen(),
-    const SettingsScreen(),
+    const MyDBNScreen(),
   ];
 
   @override
@@ -38,27 +38,39 @@ class MainScreenState extends ConsumerState<MainScreen> {
             _currentIndex = index;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(
+              _currentIndex == 0 ? Icons.home : Icons.home_outlined,
+              weight: 0.5,
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'Shop',
+            icon: Icon(
+              _currentIndex == 1 ? Icons.sports_soccer : Icons.sports_soccer_outlined,
+              weight: 0.5,
+            ),
+            label: 'Matches',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'About',
+            icon: Icon(
+              _currentIndex == 2 ? Icons.shopping_bag : Icons.shopping_bag_outlined,
+              weight: 0.5,
+            ),
+            label: 'Store',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(
+              _currentIndex == 3 ? Icons.person : Icons.person_outline,
+              weight: 0.5,
+            ),
+            label: 'MyDBN',
           ),
         ],
         backgroundColor: AppColors.primaryBlue,
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.6),
+        unselectedItemColor: Colors.white.withAlpha(153),
         showUnselectedLabels: true,
       ),
     );

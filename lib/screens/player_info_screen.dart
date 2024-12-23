@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../constants.dart/colors.dart';
+import '../constants/colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PlayerInfoScreen extends StatelessWidget {
   final String? playerName;
@@ -61,15 +61,58 @@ class PlayerInfoScreen extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Container(
+                SizedBox(
                   height: 300,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                          playerImage ?? 'assets/images/dunbeholden.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  child: playerImage?.startsWith('http') == true
+                      ? CachedNetworkImage(
+                          imageUrl: playerImage!,
+                          fit: BoxFit.cover,
+                          memCacheWidth: 600,
+                          memCacheHeight: 800,
+                          maxWidthDiskCache: 600,
+                          maxHeightDiskCache: 800,
+                          fadeInDuration: const Duration(milliseconds: 300),
+                          placeholderFadeInDuration: const Duration(milliseconds: 300),
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: Image.asset(
+                                'assets/images/dunbeholden.png',
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: Image.asset(
+                                'assets/images/dunbeholden.png',
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                          ),
+                        )
+                      : Image.asset(
+                          playerImage ?? 'assets/images/dunbeholden.png',
+                          fit: BoxFit.cover,
+                          cacheWidth: 600,
+                          cacheHeight: 800,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: Image.asset(
+                                'assets/images/dunbeholden.png',
+                                width: 80,
+                                height: 80,
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
                 Container(
                   height: 300,
@@ -79,7 +122,7 @@ class PlayerInfoScreen extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withAlpha(179),
                       ],
                     ),
                   ),
