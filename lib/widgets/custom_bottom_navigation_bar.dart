@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants.dart/colors.dart';
-import '../screens/about_screen.dart';
 import '../screens/home_screen.dart';
-import '../screens/settings_screen.dart';
+import '../screens/matches_screen.dart';
 import '../screens/shop_screen.dart';
+import '../screens/mydbn_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -18,9 +18,9 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
+    const MatchesScreen(),
     const ShopScreen(),
-    const AboutScreen(),
-    const SettingsScreen(),
+    const MyDBNScreen(),
   ];
 
   @override
@@ -44,16 +44,16 @@ class MainScreenState extends ConsumerState<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.sports_soccer),
+            label: 'Matches',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag),
             label: 'Shop',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: 'About',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.person),
+            label: 'MyDBN',
           ),
         ],
         backgroundColor: AppColors.primaryBlue,

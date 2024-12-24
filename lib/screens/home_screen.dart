@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Add this import
-// import '../widgets/video_post_widget.dart';
-import 'calendar_screen.dart';
-import 'news_detail_screen.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import '../providers/post_provider.dart';
 import '../constants.dart/colors.dart';
-import 'players_screen.dart';
+import '../widgets/loading_skeleton.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'settings_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
-  String getCurrentDate() {
+class HomeScreenState extends ConsumerState<HomeScreen> {
+  String _formatDate(DateTime date) {
     final now = DateTime.now();
-    final formatter = DateFormat(
-        'EEEE d MMMM'); // This will format the date as "Tuesday 8 October"
-    return formatter.format(now);
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        return '${difference.inMinutes}m ago';
+      }
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('d MMM').format(date);
+    }
   }
 
   @override
@@ -27,124 +36,196 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const CalendarScreen()));
-          },
-          icon: const Icon(Icons.calendar_today, color: Colors.white),
-        ),
+        
         centerTitle: true,
         title: const Text('News', style: TextStyle(color: Colors.white)),
         actions: [
-          // const Icon(Icons.search, color: Colors.white),
-          const SizedBox(width: 10),
           IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const PlayersScreen()));
-              },
-              icon: const Icon(Icons.people, color: Colors.white)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            icon: const Icon(Icons.settings, color: Colors.white),
+          ),
           const SizedBox(width: 10),
         ],
       ),
-      body: ListView(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              "WHAT'S NEW",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              getCurrentDate(), // Use the getCurrentDate function here
-              style: const TextStyle(color: Colors.grey),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const NewsPostWidget(
-            imageUrl: 'assets/images/3-3.png',
-            title:
-                'Big Balla Chevoy Watkin pulls us back level! From 2-0 down to 3-3—resilience and heart on full display. ❤️💙',
-            content:
-                'Three of our players will now not be joining up with their countries during the break.',
-            timeAgo: '1 day ago',
-          ),
-          // Add more NewsPostWidget items here
-          const NewsPostWidget(
-            imageUrl: 'assets/images/charity-match.jpg',
-            title: 'Dunbeholden FC and NCB Foundation team up for a Christmas treat for elders',
-            content:
-                '''With a little help from NCB Foundation, the Dunbeholden Football Club in St Catherine has secured \$100,000 to grant a wish for elders in their community this Christmas. The Grant A Wish donation will fund an annual Christmas treat for seniors in the community – an annual undertaking by the Dunbeholden Football Club in partnership with the Star Church of God in Dunbeholden.
+      body: _buildNewsFeed(),
+    );
+  }
 
-"Football is bigger than the matches we play – it's about the connections we create and the lives we touch off the field," said Roger Simmonds, Dunbeholden FC manager. "Working with NCB Foundation's Grant A Wish initiative is an incredible opportunity because it allows us to extend the spirit of teamwork beyond our players and fans to the community at large."
+  Widget _buildNewsFeed() {
+    final postsState = ref.watch(postsStreamProvider);
 
-He added, "Sports, like football, have the power to change lives, and today, we've proven that by securing the funding to make the season a little brighter for our elders in the community."''',
-            timeAgo: '1h',
-          ),
-          const SizedBox(height: 16),
-          // You can continue adding more NewsPostWidget items as needed
-        ],
+    return postsState.when(
+      data: (posts) {
+        if (posts.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        final announcements = posts.where((post) => 
+          post.category.toLowerCase() == 'announcement').toList();
+        final otherPosts = posts.where((post) => 
+          post.category.toLowerCase() != 'announcement').toList();
+
+        return ListView(
+          children: [
+           
+           
+            if (announcements.isNotEmpty)
+              _buildAnnouncementCard(announcements.first),
+            ...otherPosts.map((post) => _buildRegularPostCard(post)),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Error: $error'),
       ),
     );
   }
-}
 
-class NewsPostWidget extends StatelessWidget {
-  final String title;
-  final String content;
-  final String imageUrl;
-  final String timeAgo;
-
-  const NewsPostWidget({
-    super.key,
-    required this.title,
-    required this.content,
-    required this.imageUrl,
-    required this.timeAgo,
-  });
-
-  String _getPreviewContent(String fullContent) {
-    // Split content into lines and take first three
-    final lines = fullContent.split('\n').take(1).join('\n');
-    // If content is longer than preview, add ellipsis
-    return lines + (fullContent.split('\n').length > 1 ? '...' : '');
+  Widget _buildAnnouncementCard(Post post) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/news-detail',
+        arguments: post.id,
+      ),
+      child: Container(
+        height: 500,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(26),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (post.image.isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: post.image,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.image,
+                      size: 48,
+                      color: Colors.grey[300],
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.grey[300],
+                    ),
+                  ),
+                ),
+              ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withAlpha(77),
+                    Colors.black.withAlpha(128),
+                    const Color(0xFF1E3A8A).withAlpha(179),
+                    const Color(0xFF1E3A8A).withAlpha(242),
+                  ],
+                  stops: const [0.0, 0.3, 0.6, 1.0],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 24,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.campaign_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        "Men's Team",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '• ${_formatDate(post.date)}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    post.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildRegularPostCard(Post post) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NewsDetailScreen(
-              imageUrl: imageUrl,
-              title: title,
-              content: content,
-              timeAgo: timeAgo,
-            ),
-          ),
-        );
-      },
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/news-detail',
+        arguments: post.id,
+      ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withAlpha(26),
               spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -152,17 +233,21 @@ class NewsPostWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Men's Team • $timeAgo",
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  Row(
+                    children: [
+                      Text(
+                        "Men's Team • ${_formatDate(post.date)}",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    title,
+                    post.title,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -171,37 +256,57 @@ class NewsPostWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _getPreviewContent(content),
+                    post.summary,
                     style: TextStyle(color: Colors.grey[800]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (content.split('\n').length > 3)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Read More',
-                        style: TextStyle(
-                          color: AppColors.primaryBlue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
+            if (post.image.isNotEmpty)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(12),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: post.image,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Text('No posts available'),
     );
   }
 }

@@ -1,97 +1,169 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import '../constants.dart/colors.dart';
+import '../providers/post_provider.dart';
 
-
-class NewsDetailScreen extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String content;
-  final String timeAgo;
+class NewsDetailScreen extends ConsumerWidget {
+  final String postId;
 
   const NewsDetailScreen({
     super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.content,
-    required this.timeAgo,
+    required this.postId,
   });
 
+  String _formatDate(DateTime date) {
+    return DateFormat('EEE dd MMM yyyy, HH:mm').format(date);
+  }
+
+  String _parseHtmlString(String htmlString) {
+    // Remove <p> tags
+    var text = htmlString.replaceAll(RegExp(r'<p>|</p>'), '');
+    // Remove other common HTML tags if needed
+    text = text.replaceAll(RegExp(r'<[^>]*>'), '');
+    // Replace HTML entities
+    text = text.replaceAll('&nbsp;', ' ')
+              .replaceAll('&amp;', '&')
+              .replaceAll('&quot;', '"')
+              .replaceAll('&apos;', "'")
+              .replaceAll('&lt;', '<')
+              .replaceAll('&gt;', '>');
+    return text;
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final postsState = ref.watch(postsStreamProvider);
+
+    return postsState.when(
+      data: (posts) {
+        final post = posts.firstWhere((p) => p.id == postId);
+        final parsedContent = _parseHtmlString(post.content);
+        
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.share, color: Colors.black),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  imageUrl,
-                  width: double.infinity,
-                  height: 300,
-                  fit: BoxFit.cover,
-                ),
-                Positioned(
-                  top: 40,
-                  right: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
+                if (post.image.isNotEmpty)
+                  CachedNetworkImage(
+                    imageUrl: post.image,
+                    width: double.infinity,
+                    height: 300,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[100],
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[100],
+                      child: const Icon(Icons.error),
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          "MEN'S TEAM",
+                          style: TextStyle(
+                            color: Colors.blue[700],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        post.title,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          height: 1.2,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: post.author.isNotEmpty
+                                ? NetworkImage(post.author)
+                                : null,
+                            child: post.author.isEmpty
+                                ? const Icon(Icons.person, color: Colors.grey)
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'by ${post.author}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                _formatDate(post.date),
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        parsedContent,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.6,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            Container(
-              color: AppColors.accentRed,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'Men',
-                      style: TextStyle(color: AppColors.accentRed),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time, color: Colors.yellow, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        timeAgo,
-                        style: const TextStyle(color: Colors.yellow),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                content,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-            // Add more widgets here for additional content or advertisements
-          ],
-        ),
+          ),
+        );
+      },
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(child: Text('Error: $error')),
       ),
     );
   }
