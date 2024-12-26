@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/post_provider.dart';
-import '../constants.dart/colors.dart';
+import '../constants/colors.dart';
 import '../widgets/loading_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'settings_screen.dart';
@@ -43,7 +43,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         backgroundColor: AppColors.primaryBlue,
         
         centerTitle: true,
-        title: _appLogo,
+        title: const Text("Dunbeholden FC"),
         actions: [
           IconButton(
             onPressed: () {
@@ -271,7 +271,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             Padding(
               padding: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
+              
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
