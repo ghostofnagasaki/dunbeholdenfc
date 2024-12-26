@@ -43,7 +43,6 @@ class Post {
   final String image;
   final String author;
   final bool featured;
-  final MatchDetails? matchDetails;
   final String seoDescription;
   final String slug;
   final String status;
@@ -59,31 +58,59 @@ class Post {
     required this.image,
     required this.author,
     required this.featured,
-    this.matchDetails,
     required this.seoDescription,
     required this.slug,
     required this.status,
     required this.tags,
   });
 
+  Post copyWith({
+    String? id,
+    String? title,
+    String? content,
+    String? summary,
+    String? category,
+    DateTime? date,
+    String? image,
+    String? author,
+    bool? featured,
+    String? seoDescription,
+    String? slug,
+    String? status,
+    List<String>? tags,
+  }) {
+    return Post(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      summary: summary ?? this.summary,
+      category: category ?? this.category,
+      date: date ?? this.date,
+      image: image ?? this.image,
+      author: author ?? this.author,
+      featured: featured ?? this.featured,
+      seoDescription: seoDescription ?? this.seoDescription,
+      slug: slug ?? this.slug,
+      status: status ?? this.status,
+      tags: tags ?? this.tags,
+    );
+  }
+
   factory Post.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return Post(
       id: doc.id,
-      title: data['title'] ?? '',
-      content: data['content'] ?? '',
-      summary: data['summary'] ?? '',
-      category: data['category'] ?? 'News',
-      date: (data['date'] as Timestamp).toDate(),
-      image: data['image'] ?? '',
-      author: data['author'] ?? '',
-      featured: data['featured'] ?? false,
-      matchDetails: data['matchDetails'] != null 
-          ? MatchDetails.fromMap(data['matchDetails'] as Map<String, dynamic>)
-          : null,
-      seoDescription: data['seoDescription'] ?? '',
-      slug: data['slug'] ?? '',
-      status: data['status'] ?? 'draft',
+      title: data['title'] as String? ?? '',
+      content: data['content'] as String? ?? '',
+      summary: data['summary'] as String? ?? '',
+      category: data['category'] as String? ?? 'News',
+      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      image: data['image'] as String? ?? '',
+      author: data['author'] as String? ?? '',
+      featured: data['featured'] as bool? ?? false,
+      seoDescription: data['seoDescription'] as String? ?? '',
+      slug: data['slug'] as String? ?? '',
+      status: data['status'] as String? ?? 'draft',
       tags: List<String>.from(data['tags'] ?? []),
     );
   }
@@ -153,4 +180,4 @@ final groupedPostsProvider = Provider<Map<String, List<Post>>>((ref) {
     loading: () => {},
     error: (_, __) => {},
   );
-}); 
+});

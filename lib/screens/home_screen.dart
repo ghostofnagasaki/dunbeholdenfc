@@ -1,53 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../constants/colors.dart';
-import '../constants/styles.dart';
+import 'package:intl/intl.dart';
 import '../providers/post_provider.dart';
-import '../widgets/error_boundary.dart';
+import '../constants/colors.dart';
 import '../widgets/loading_skeleton.dart';
-import 'settings_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final DateTime Function() getCurrentTime;
+
+  const HomeScreen({
+    super.key,
+    this.getCurrentTime = DateTime.now,
+  });
 
   @override
   ConsumerState<HomeScreen> createState() => HomeScreenState();
 }
 
-// Add const logo widget
-const _appLogo = Image(
-  image: AssetImage('assets/icons/dunbeholden_white.png'),
-  height: 40,
-  fit: BoxFit.contain,
-);
-
 class HomeScreenState extends ConsumerState<HomeScreen> {
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
-  bool _didPrecache = false;
+  String _formatDate(DateTime date) {
+    final now = widget.getCurrentTime();
+    final difference = now.difference(date);
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_didPrecache) {
-      precacheImage(const AssetImage('assets/icons/dunbeholden_white.png'), context);
-      _didPrecache = true;
-    }
-  }
-
-  @override
-  void dispose() {
-    _refreshController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onRefresh() async {
-    try {
-      await ref.read(postsProvider.notifier).refreshPosts();
-      _refreshController.refreshCompleted();
-    } catch (e) {
-      _refreshController.refreshFailed();
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        return '${difference.inMinutes}m ago';
+      }
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('d MMM').format(date);
     }
   }
 
@@ -56,38 +41,23 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
+        
         centerTitle: true,
-        title: _appLogo,
+        title: const Text("Dunbeholden FC"),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.settings,
-              color: Colors.white,
-            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
+            icon: const Icon(Icons.settings, color: Colors.white),
           ),
+          const SizedBox(width: 10),
         ],
       ),
-      body: ErrorBoundary(
-        child: SmartRefresher(
-          controller: _refreshController,
-          onRefresh: _onRefresh,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildNewsFeed(),
-              ],
-            ),
-          ),
-        ),
-      ),
+      body: _buildNewsFeed(),
     );
   }
 
@@ -100,47 +70,25 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           return _buildEmptyState();
         }
 
-        final groupedPosts = ref.watch(groupedPostsProvider);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: groupedPosts.entries.map((entry) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(
-                    entry.key.toUpperCase(),
-                    style: AppStyles.subheadingStyle.copyWith(
-                      color: AppColors.primaryBlue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: entry.value.length,
-                  itemBuilder: (context, index) {
-                    final post = entry.value[index];
-                    final isAnnouncement = post.category.toLowerCase() == 'announcement';
+        final announcements = posts.where((post) => 
+          post.category.toLowerCase() == 'announcement').toList();
+        final otherPosts = posts.where((post) => 
+          post.category.toLowerCase() != 'announcement').toList();
 
-                    if (isAnnouncement) {
-                      return _buildAnnouncementCard(post);
-                    }
-                    
-                    return _buildRegularPostCard(post);
-                  },
-                ),
-              ],
-            );
-          }).toList(),
+        return ListView(
+          children: [
+           
+           
+            if (announcements.isNotEmpty)
+              _buildAnnouncementCard(announcements.first),
+            ...otherPosts.map((post) => _buildRegularPostCard(post)),
+          ],
         );
       },
-      loading: () => Column(
-        children: List.generate(2, (index) => const PostLoadingSkeleton()),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Error: $error'),
       ),
-      error: (error, stackTrace) => _buildErrorState(error.toString()),
     );
   }
 
@@ -152,10 +100,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         arguments: post.id,
       ),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        height: 400,
+        height: 500,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withAlpha(26),
@@ -169,38 +115,34 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           fit: StackFit.expand,
           children: [
             if (post.image.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(
-                  imageUrl: post.image,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
+              CachedNetworkImage(
+                imageUrl: post.image,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.image,
+                      size: 48,
+                      color: Colors.grey[300],
                     ),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.grey[300],
                     ),
                   ),
                 ),
               ),
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
+                  begin: Alignment.center,
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.black.withAlpha(77),
@@ -329,43 +271,71 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             Padding(
               padding: const EdgeInsets.all(16),
+              
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Men's Team • ${_formatDate(post.date)}",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     post.title,
-                    style: AppStyles.headingStyle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     post.summary,
-                    style: AppStyles.bodyStyle,
-                    maxLines: 3,
+                    style: TextStyle(color: Colors.grey[800]),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Text(
-                        _formatDate(post.date),
-                        style: AppStyles.captionStyle,
-                      ),
-                      if (post.author.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        const Text('•', style: TextStyle(color: Colors.grey)),
-                        const SizedBox(width: 8),
-                        Text(
-                          post.author,
-                          style: AppStyles.captionStyle,
-                        ),
-                      ],
-                    ],
                   ),
                 ],
               ),
             ),
+            if (post.image.isNotEmpty)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(12),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: post.image,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -373,52 +343,8 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/icons/dunbeholden.png',
-            height: 100,
-            width: 100,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No Posts Available',
-            style: AppStyles.headingStyle.copyWith(
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for updates',
-            style: AppStyles.bodyStyle,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return const Center(
+      child: Text('No posts available'),
     );
-  }
-
-  Widget _buildErrorState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Error: $message',
-            style: const TextStyle(color: Colors.red),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 }

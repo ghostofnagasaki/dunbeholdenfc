@@ -97,6 +97,27 @@ app.*.map.json
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+**/android/.idea/
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/android/**/*.jks
+**/android/**/*.keystore
+**/android/**/*.bin
+**/android/**/*.lock
+**/android/**/.settings
+**/android/**/.project
+**/android/**/.classpath
+
 # Keystore files
 /android/key.properties
 
