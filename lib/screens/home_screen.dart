@@ -8,7 +8,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final DateTime Function() getCurrentTime;
+
+  const HomeScreen({
+    super.key,
+    this.getCurrentTime = DateTime.now,
+  });
 
   @override
   HomeScreenState createState() => HomeScreenState();
@@ -16,7 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class HomeScreenState extends ConsumerState<HomeScreen> {
   String _formatDate(DateTime date) {
-    final now = DateTime.now();
+    final now = widget.getCurrentTime();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
