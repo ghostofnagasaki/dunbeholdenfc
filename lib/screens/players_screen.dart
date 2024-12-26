@@ -61,8 +61,8 @@ class _PlayersScreenState extends State<PlayersScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Text(
               'FORWARDS',
               style: AppStyles.subheadingStyle,

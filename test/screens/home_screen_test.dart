@@ -5,27 +5,10 @@ import 'package:network_image_mock/network_image_mock.dart';
 import 'package:dunbeholden/screens/home_screen.dart';
 import 'package:dunbeholden/providers/post_provider.dart';
 import 'package:dunbeholden/screens/settings_screen.dart';
-import 'package:intl/intl.dart';
-import 'package:clock/clock.dart';
+
 import 'dart:async';
 
 void main() {
-  final testAnnouncement = Post(
-    id: 'announcement-1',
-    title: 'Important Announcement',
-    content: 'Test Announcement Content',
-    summary: 'Test Summary',
-    category: 'Announcement',
-    date: DateTime(2024, 1, 1, 12, 30),
-    image: 'https://example.com/announcement.jpg',
-    author: 'Test Author',
-    featured: true,
-    seoDescription: 'Test SEO',
-    slug: 'test-announcement',
-    status: 'published',
-    tags: ['announcement'],
-  );
-
   final testRegularPost = Post(
     id: 'post-1',
     title: 'Regular Post',

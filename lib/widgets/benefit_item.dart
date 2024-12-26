@@ -39,8 +39,8 @@ class BenefitItem extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
-            color: textColor.withOpacity(0.8),
-            fontSize: 12,
+            color: textColor.withAlpha(204),
+            fontSize: 14,
           ),
         ),
       ],

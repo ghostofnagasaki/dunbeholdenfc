@@ -1,11 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dunbeholden/providers/post_provider.dart';
+import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
+
+@GenerateNiceMocks([MockSpec<DocumentSnapshot>(as: #GeneratedMockDocumentSnapshot)])
+import 'post_test.mocks.dart';
 
 void main() {
   group('Post Model Tests', () {
     test('should create Post from Firestore data', () {
       // Arrange
+      final mockDoc = GeneratedMockDocumentSnapshot();
       final data = {
         'title': 'Test Post',
         'content': 'Test Content',
@@ -21,10 +27,11 @@ void main() {
         'tags': ['tag1', 'tag2'],
       };
 
+      when(mockDoc.data()).thenReturn(data);
+      when(mockDoc.id).thenReturn('test-id');
+
       // Act
-      final post = Post.fromFirestore(
-        MockDocumentSnapshot(data, 'test-id'),
-      );
+      final post = Post.fromFirestore(mockDoc);
 
       // Assert
       expect(post.id, 'test-id');
@@ -44,12 +51,14 @@ void main() {
 
     test('should handle missing or null data', () {
       // Arrange
+      final mockDoc = GeneratedMockDocumentSnapshot();
       final data = <String, dynamic>{};
 
+      when(mockDoc.data()).thenReturn(data);
+      when(mockDoc.id).thenReturn('test-id');
+
       // Act
-      final post = Post.fromFirestore(
-        MockDocumentSnapshot(data, 'test-id'),
-      );
+      final post = Post.fromFirestore(mockDoc);
 
       // Assert
       expect(post.id, 'test-id');
@@ -66,20 +75,4 @@ void main() {
       expect(post.tags, isEmpty);
     });
   });
-}
-
-class MockDocumentSnapshot implements DocumentSnapshot {
-  final Map<String, dynamic> _data;
-  final String _id;
-
-  MockDocumentSnapshot(this._data, this._id);
-
-  @override
-  Map<String, dynamic> data() => _data;
-
-  @override
-  String get id => _id;
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 } 

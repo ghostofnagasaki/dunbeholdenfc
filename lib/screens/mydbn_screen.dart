@@ -73,7 +73,7 @@ class MyDBNScreen extends ConsumerWidget {
             'Get access to exclusive content, personalise your profile, see your predictions scores & fan stats, plus official stickers!',
             textAlign: TextAlign.center,
             style: AppStyles.bodyStyle.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withAlpha(230),
               fontSize: 16,
             ),
           ),
@@ -87,7 +87,7 @@ class MyDBNScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text(
+            child: const Text(
               'SIGN FOR DUNBEHOLDEN',
               style: TextStyle(
                 color: AppColors.primaryBlue,
@@ -105,32 +105,32 @@ class MyDBNScreen extends ConsumerWidget {
 
   Widget _buildBenefitsGrid(BuildContext context) {
     final benefits = [
-      BenefitData(
+      const BenefitData(
         icon: Icons.star,
         title: 'DAILY EXCLUSIVES',
         description: 'Player training, interviews, club news & more',
       ),
-      BenefitData(
+      const BenefitData(
         icon: Icons.sports_soccer,
         title: 'DBN PREDICTIONS',
         description: 'Play, score & win prizes every matchday!',
       ),
-      BenefitData(
+      const BenefitData(
         icon: Icons.emoji_events,
         title: 'WIN REWARDS',
         description: 'Exclusive prizes and special offers',
       ),
-      BenefitData(
+      const BenefitData(
         icon: Icons.person,
         title: 'PLAYER PROFILE',
         description: 'Customize your fan experience',
       ),
-      BenefitData(
+      const BenefitData(
         icon: Icons.chat,
         title: 'FAN COMMUNITY',
         description: 'Connect with other supporters',
       ),
-      BenefitData(
+      const BenefitData(
         icon: Icons.notifications,
         title: 'MATCH ALERTS',
         description: 'Never miss a game or update',

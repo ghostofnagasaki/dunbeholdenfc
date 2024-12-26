@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/post_provider.dart';
 import '../constants/colors.dart';
-import '../widgets/loading_skeleton.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'settings_screen.dart';
 

@@ -23,7 +23,7 @@ class SettingsScreen extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_back_ios,
                     color: AppColors.primaryBlue,
                   ),
@@ -32,7 +32,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'JOIN THE CLUB',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -111,7 +111,7 @@ class SettingsScreen extends ConsumerWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: Icon(
+      trailing: const Icon(
         Icons.arrow_forward_ios,
         color: AppColors.primaryBlue,
         size: 16,
