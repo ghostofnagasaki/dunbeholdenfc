@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  HomeScreenState createState() => HomeScreenState();
+  ConsumerState<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends ConsumerState<HomeScreen> {
@@ -43,7 +43,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         backgroundColor: AppColors.primaryBlue,
         
         centerTitle: true,
-        title: const Text('News', style: TextStyle(color: Colors.white)),
+        title: _appLogo,
         actions: [
           IconButton(
             onPressed: () {
@@ -237,7 +237,40 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (post.image.isNotEmpty)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: CachedNetworkImage(
+                  imageUrl: post.image,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             Padding(
+              padding: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

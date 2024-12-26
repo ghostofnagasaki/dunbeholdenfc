@@ -20,6 +20,11 @@ final Map<String, List<Map<String, dynamic>>> staffData = {
       'role': 'Kit Manager',
       'imagePath': 'assets/staff/judith-drummond.jpg',
     },
+    {
+      'name': 'Roger Simmonds',
+      'role': 'General Manager',
+      'imagePath': 'assets/staff/roger-simmonds.jpeg',
+    }
     // Add more coaching staff...
   ],
   // 'medical': [

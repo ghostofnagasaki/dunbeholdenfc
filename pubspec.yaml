@@ -8,14 +8,14 @@ version: 1.0.2+1
 environment:
   sdk: ^3.5.0
 
-
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^2.13.0
-  firebase_auth: ^4.6.2
-  cloud_firestore: ^4.7.1
-  firebase_storage: ^11.7.7
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
+  firebase_storage: ^11.6.0
+  firebase_messaging: ^14.7.10
   flutter_riverpod: ^2.3.6
   firebase_messaging: ^14.9.4
   cached_network_image: ^3.3.1
@@ -50,16 +50,15 @@ dev_dependencies:
 
 
 flutter:
-
   uses-material-design: true
 
   assets:
   # icons
-
     - assets/icons/apple.png
     - assets/icons/google.png
     - assets/icons/facebook.png
     - assets/icons/dunbeholden.png
+    - assets/icons/dunbeholden_white.png
     - assets/icons/waterhouse.png
     - assets/icons/hvfc.png
     - assets/icons/lhcc.png
@@ -70,7 +69,6 @@ flutter:
     - assets/icons/molynes.png
 
   # images
-
     - assets/images/d1.png
     - assets/images/d2.png
     - assets/images/150x150.png
@@ -78,6 +76,7 @@ flutter:
     - assets/images/dunbeholden.png
     - assets/images/arnett-gardens-fc-logo.png
     - assets/images/home_jersey.png
+    - assets/images/home_jersey_back.png
     - assets/images/3-3.png
     - assets/images/charity-match.jpg
 
@@ -86,6 +85,7 @@ flutter:
     - assets/staff/oneisho-goode.jpg
     - assets/staff/vivian-matthews.jpg
     - assets/staff/judith-drummond.jpg
+    - assets/staff/roger-simmonds.jpeg
 
   # players
     - assets/images/players/ajuma_johnson.jpg
@@ -105,33 +105,3 @@ flutter:
     - assets/images/players/saneekie_burton.jpg
     - assets/images/players/shakeen_powell.jpg
     - assets/images/players/tyrese_gowe.jpg
-  
-flutter_native_splash:
-
-  color: "#1343FF"
-  image: "assets/icons/db_circle.png"
-  android: true
-  ios: true
-  android_12: 
-    color: "#1343FF"
-    # App icon background color.
-    icon_background_color: "#1343FF"
-    image: assets/icons/db_circle.png
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icons/db_logo_icons/android/mipmap-mdpi/ic_launcher.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-  web:
-    generate: true
-    image_path: "assets/images/dunbeholden.png"
-    background_color: "#1343FF"
-    theme_color: "#1343FF"
-  windows:
-    generate: true
-    image_path: "assets/images/dunbeholden.png"
-    icon_size: 48 # min:48, max:256, default: 48
-  macos:
-    generate: true
-    image_path: "assets/images/dunbeholden.png"

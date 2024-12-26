@@ -7,28 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:295450309393:android:9be2271f0f1824c60012b0",
+        "mobilesdk_app_id": "1:295450309393:android:7401323a2533657b0012b0",
         "android_client_info": {
-          "package_name": "com.example.schoolapp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA79QRA45vdCGq48LD65LhAjDulNByhPIU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:295450309393:android:b92924a554ec62d20012b0",
-        "android_client_info": {
-          "package_name": "com.schoolapp.example"
+          "package_name": "com.dunbeholden.app"
         }
       },
       "oauth_client": [],

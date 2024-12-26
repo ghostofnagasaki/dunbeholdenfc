@@ -59,7 +59,6 @@ migrate_working_dir/
 /build/
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbols
@@ -97,4 +96,30 @@ app.*.map.json
 **/ios/Flutter/flutter_assets/
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
-android/key.properties
+
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+**/android/.idea/
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/android/**/*.jks
+**/android/**/*.keystore
+**/android/**/*.bin
+**/android/**/*.lock
+**/android/**/.settings
+**/android/**/.project
+**/android/**/.classpath
+
+# Keystore files
+/android/key.properties
+
+node_modules
+.vercel
