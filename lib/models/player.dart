@@ -2,65 +2,74 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Player {
   final String id;
-  final String actionImage;
-  final int appearances;
-  final int assists;
-  final String biography;
-  final DateTime dateOfBirth;
-  final int goals;
-  final String height;
-  final bool isActive;
-  final String jerseyNumber;
   final String name;
-  final String nationality;
+  final String jerseyNumber;
   final String position;
-  final String previousClubs;
   final String profileImage;
-  final DateTime updatedAt;
+  final String nationality;
+  final DateTime? dateOfBirth;
+  final String height;
   final String weight;
-  final String databaseLocation;
+  final String preferredFoot;
+  final int appearances;
+  final int goals;
+  final int assists;
+  final int cleanSheets;
+  final bool isActive;
+  final String biography;
+  final String previousClubs;
+  final DateTime? updatedAt;
 
   Player({
     required this.id,
-    required this.actionImage,
-    required this.appearances,
-    required this.assists,
-    required this.biography,
-    required this.dateOfBirth,
-    required this.goals,
-    required this.height,
-    required this.isActive,
-    required this.jerseyNumber,
     required this.name,
-    required this.nationality,
+    required this.jerseyNumber,
     required this.position,
-    required this.previousClubs,
     required this.profileImage,
-    required this.updatedAt,
+    required this.nationality,
+    this.dateOfBirth,
+    required this.height,
     required this.weight,
-    required this.databaseLocation,
+    required this.preferredFoot,
+    required this.appearances,
+    required this.goals,
+    required this.assists,
+    required this.cleanSheets,
+    required this.isActive,
+    required this.biography,
+    required this.previousClubs,
+    this.updatedAt,
   });
 
   factory Player.fromMap(String id, Map<String, dynamic> map) {
     return Player(
       id: id,
-      actionImage: map['actionImage'] ?? '',
-      appearances: map['appearances'] ?? 0,
-      assists: map['assists'] ?? 0,
-      biography: map['biography'] ?? '',
-      dateOfBirth: (map['dateOfBirth'] as Timestamp).toDate(),
-      goals: map['goals'] ?? 0,
-      height: map['height'] ?? '',
-      isActive: map['isActive'] ?? false,
-      jerseyNumber: map['jerseyNumber'] ?? '',
       name: map['name'] ?? '',
-      nationality: map['nationality'] ?? '',
+      jerseyNumber: map['jerseyNumber'] ?? '',
       position: map['position'] ?? '',
-      previousClubs: map['previousClubs'] ?? '',
       profileImage: map['profileImage'] ?? '',
-      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      nationality: map['nationality'] ?? '',
+      dateOfBirth: map['dateOfBirth'] != null 
+          ? (map['dateOfBirth'] as Timestamp).toDate() 
+          : null,
+      height: map['height'] ?? '',
       weight: map['weight'] ?? '',
-      databaseLocation: map['databaseLocation'] ?? '',
+      preferredFoot: map['preferredFoot'] ?? '',
+      appearances: map['appearances'] ?? 0,
+      goals: map['goals'] ?? 0,
+      assists: map['assists'] ?? 0,
+      cleanSheets: map['cleanSheets'] ?? 0,
+      isActive: map['isActive'] ?? true,
+      biography: map['biography'] ?? '',
+      previousClubs: map['previousClubs'] ?? '',
+      updatedAt: map['updatedAt'] != null 
+          ? (map['updatedAt'] as Timestamp).toDate() 
+          : null,
     );
+  }
+
+  String get formattedDateOfBirth {
+    if (dateOfBirth == null) return 'N/A';
+    return '${dateOfBirth!.day}/${dateOfBirth!.month}/${dateOfBirth!.year}';
   }
 } 

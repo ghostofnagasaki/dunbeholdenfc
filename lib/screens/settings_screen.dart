@@ -12,85 +12,153 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+      backgroundColor: AppColors.primaryBlue,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Back Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    color: AppColors.primaryBlue,
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
-            const Text(
-              'JOIN THE CLUB',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryBlue,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Become a part of Dunbeholden's global fan community and gain access to exclusive features including Play Predictor, Live Streams and more!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey[800],
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            _buildSettingsItem(context, 'Settings', Icons.settings),
-            _buildSettingsItem(context, 'Legal', Icons.gavel),
-            _buildSettingsItem(
-              context, 
-              'Membership Form', 
-              Icons.card_membership,
-              onTap: _launchURL,
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text(
-                'Delete My Data',
-                style: TextStyle(color: Colors.red),
-              ),
-              onTap: () {
-                Navigator.push(
+            
+            // Account Section
+            _buildSection(
+              'Account',
+              [
+                _buildSettingsItem(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const DeleteAccountScreen(),
-                  ),
-                );
-              },
+                  'Profile',
+                  Icons.person_outline,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Notifications',
+                  Icons.notifications_outlined,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Privacy',
+                  Icons.lock_outline,
+                ),
+              ],
             ),
-            const Spacer(),
+
+            // Membership Section
+            _buildSection(
+              'Membership',
+              [
+                _buildSettingsItem(
+                  context,
+                  'Join DBN',
+                  Icons.card_membership,
+                  onTap: _launchURL,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Benefits',
+                  Icons.star_outline,
+                ),
+              ],
+            ),
+
+            // Support Section
+            _buildSection(
+              'Support',
+              [
+                _buildSettingsItem(
+                  context,
+                  'Help Center',
+                  Icons.help_outline,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Contact Us',
+                  Icons.mail_outline,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Terms of Service',
+                  Icons.description_outlined,
+                  showDivider: true,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Privacy Policy',
+                  Icons.privacy_tip_outlined,
+                ),
+              ],
+            ),
+
+            // Danger Zone
+            _buildSection(
+              'Danger Zone',
+              [
+                _buildSettingsItem(
+                  context,
+                  'Delete Account',
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DeleteAccountScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // Social Media Links
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _SocialIcon(icon: Icons.facebook),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.twitter),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.instagram),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.youtube),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.tiktok),
+                  Text(
+                    'Follow Us',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _SocialIcon(icon: Icons.facebook),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.twitter),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.instagram),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.youtube),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.tiktok),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -100,25 +168,72 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSettingsItem(BuildContext context, String title, IconData icon, {VoidCallback? onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.primaryBlue),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Colors.grey[800],
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
+  Widget _buildSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          child: Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
         ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        color: AppColors.primaryBlue,
-        size: 16,
-      ),
-      onTap: onTap ?? () {
-        // Handle navigation to respective settings pages
-      },
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(26),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: items,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsItem(
+    BuildContext context,
+    String title,
+    IconData icon, {
+    VoidCallback? onTap,
+    Color color = Colors.white,
+    bool showDivider = false,
+  }) {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(icon, color: color),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.white54,
+            size: 16,
+          ),
+          onTap: onTap ?? () {
+            // Handle navigation
+          },
+        ),
+        if (showDivider)
+          Divider(
+            color: Colors.white.withAlpha(26),
+            height: 1,
+            indent: 56,
+          ),
+      ],
     );
   }
 
@@ -140,10 +255,10 @@ class _SocialIcon extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.primaryBlue, width: 1),
+        color: Colors.white.withAlpha(26),
         borderRadius: BorderRadius.circular(50),
       ),
-      child: Icon(icon, color: AppColors.primaryBlue, size: 20),
+      child: Icon(icon, color: Colors.white, size: 20),
     );
   }
 }

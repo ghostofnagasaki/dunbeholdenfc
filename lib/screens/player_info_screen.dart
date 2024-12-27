@@ -1,318 +1,292 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../constants/colors.dart';
+import '../models/player.dart';
 
 class PlayerInfoScreen extends StatelessWidget {
-  final String? playerName;
-  final String? playerNumber;
-  final String? playerPosition;
-  final String? playerImage;
-  final String? playerCountry;
-  final int? appearances;
-  final int? goals;
-  final int? assists;
-  final String? biography;
-  final String? nationality;
-  final String? placeOfBirth;
-  final String? birthday;
-  final String? signedDate;
-  final String? height;
-  final String? weight;
-  final List<Map<String, String>>? previousClubs;
+  final Player player;
 
   const PlayerInfoScreen({
     super.key,
-    this.playerName,
-    this.playerNumber,
-    this.playerPosition,
-    this.playerImage,
-    this.playerCountry,
-    this.appearances,
-    this.goals,
-    this.assists,
-    this.biography,
-    this.nationality,
-    this.placeOfBirth,
-    this.birthday,
-    this.signedDate,
-    this.height,
-    this.weight,
-    this.previousClubs,
+    required this.player,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryBlue,
-        foregroundColor: Colors.white,
-        title: Text(playerName?.toUpperCase() ?? 'Player Info',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                SizedBox(
-                  height: 300,
-                  child: playerImage?.startsWith('http') == true
-                      ? CachedNetworkImage(
-                          imageUrl: playerImage!,
-                          fit: BoxFit.cover,
-                          memCacheWidth: 600,
-                          memCacheHeight: 800,
-                          maxWidthDiskCache: 600,
-                          maxHeightDiskCache: 800,
-                          fadeInDuration: const Duration(milliseconds: 300),
-                          placeholderFadeInDuration: const Duration(milliseconds: 300),
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[100],
-                            child: Center(
-                              child: Image.asset(
-                                'assets/images/dunbeholden.png',
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[300],
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[100],
-                            child: Center(
-                              child: Image.asset(
-                                'assets/images/dunbeholden.png',
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[300],
-                              ),
-                            ),
-                          ),
-                        )
-                      : Image.asset(
-                          playerImage ?? 'assets/images/dunbeholden.png',
-                          fit: BoxFit.cover,
-                          cacheWidth: 600,
-                          cacheHeight: 800,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey[100],
-                            child: Center(
-                              child: Image.asset(
-                                'assets/images/dunbeholden.png',
-                                width: 80,
-                                height: 80,
-                                color: Colors.grey[300],
-                              ),
-                            ),
-                          ),
-                        ),
+      backgroundColor: AppColors.primaryBlue,
+      body: CustomScrollView(
+        slivers: [
+          // Player Image and Basic Info
+          SliverAppBar(
+            expandedHeight: 350,
+            pinned: true,
+            backgroundColor: AppColors.primaryBlue,
+            leading: Container(
+              margin: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(50),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                  size: 20,
                 ),
-                Container(
-                  height: 300,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withAlpha(179),
-                      ],
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: player.profileImage,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                    errorWidget: (context, url, error) => const Icon(
+                      Icons.person,
+                      size: 100,
+                      color: Colors.white54,
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.transparent,
+                          Colors.transparent,
+                          AppColors.primaryBlue.withAlpha(100),
+                          AppColors.primaryBlue.withAlpha(200),
+                          AppColors.primaryBlue,
+                        ],
+                        stops: const [
+                          0.0,
+                          0.7,
+                          0.75,
+                          0.8,
+                          0.85,
+                          0.9,
+                          0.93,
+                          0.97,
+                          1.0,
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Player Details
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and Number
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
-                        playerNumber ?? 'N/A',
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32,
-                        ),
-                      ),
-                      Text(
-                        playerName?.toUpperCase() ?? 'Player Name',
+                        player.name,
                         style: const TextStyle(
                           color: Colors.white,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          fontSize: 24,
                         ),
                       ),
+                      const SizedBox(width: 12),
                       Text(
-                        playerPosition?.toUpperCase() ?? 'Position',
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
+                        '#${player.jerseyNumber}',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildStatColumn(
-                      'APPEARANCES', appearances?.toString() ?? 'N/A'),
-                  _buildStatColumn('GOALS', goals?.toString() ?? 'N/A'),
-                  _buildStatColumn('ASSISTS', assists?.toString() ?? 'N/A'),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add buy shirt functionality here
-                    },
-                    child: const Text('BUY MY SHIRT'),
+                  const SizedBox(height: 8),
+                  Text(
+                    player.position,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 18,
+                    ),
                   ),
+                  const SizedBox(height: 24),
+
+                  // Player Stats
+                  _buildStatsSection(),
+
+                  const SizedBox(height: 24),
+
+                  // Personal Info
+                  _buildInfoSection('Personal Information', [
+                    _buildInfoRow('Nationality', player.nationality),
+                    _buildInfoRow('Date of Birth', player.formattedDateOfBirth),
+                    _buildInfoRow('Height', player.height.isNotEmpty ? '${player.height} cm' : 'N/A'),
+                    _buildInfoRow('Weight', player.weight.isNotEmpty ? '${player.weight} kg' : 'N/A'),
+                    _buildInfoRow('Preferred Foot', player.preferredFoot.isNotEmpty ? player.preferredFoot : 'N/A'),
+                  ]),
+
+                  const SizedBox(height: 24),
+
+                  // Biography if available
+                  if (player.biography.isNotEmpty) ...[
+                    _buildInfoSection('Biography', [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          player.biography,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                    ]),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Previous Clubs if available
+                  if (player.previousClubs.isNotEmpty)
+                    _buildInfoSection('Previous Clubs', [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          player.previousClubs,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ]),
+
+                  const SizedBox(height: 24),
+
+                  // Career Stats
+                  _buildInfoSection('Career Statistics', [
+                    _buildInfoRow('Appearances', player.appearances.toString()),
+                    _buildInfoRow('Goals', player.goals.toString()),
+                    _buildInfoRow('Assists', player.assists.toString()),
+                    if (player.position == 'Goalkeeper')
+                      _buildInfoRow('Clean Sheets', player.cleanSheets.toString()),
+                  ]),
                 ],
               ),
             ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('BIOGRAPHY',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 8),
-                  Text(biography ?? 'Biography'),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {
-                      // Add see more functionality here
-                    },
-                    child: const Text('See more',
-                        style: TextStyle(color: Colors.blue)),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('NATIONALITY',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(nationality ?? 'Nationality'),
-                  const SizedBox(height: 16),
-                  const Text('PLACE OF BIRTH',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(placeOfBirth ?? 'Place of Birth'),
-                  const SizedBox(height: 16),
-                  const Text('BIRTHDAY',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(birthday ?? 'Birthday'),
-                  const SizedBox(height: 16),
-                  const Text('SIGNED',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(signedDate ?? 'Signed'),
-                  const SizedBox(height: 16),
-                  const Text('HEIGHT',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(height ?? 'Height'),
-                  const SizedBox(height: 16),
-                  const Text('WEIGHT',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(weight ?? 'Weight'),
-                ],
-              ),
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('PREVIOUS CLUBS',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 8),
-                  ...previousClubs
-                          ?.map((club) => _buildPreviousClubRow(club)) ??
-                      [],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.description),
-            label: 'Biography',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Stats',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.play_circle_fill),
-            label: 'Highlights',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'Merchandise',
           ),
         ],
-        currentIndex: 0,
-        onTap: (index) {
-          // Handle bottom navigation tap
-        },
       ),
     );
   }
 
-  Widget _buildStatColumn(String label, String value) {
+  Widget _buildStatsSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(26),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem('Apps', player.appearances.toString()),
+          _buildStatItem('Goals', player.goals.toString()),
+          _buildStatItem('Assists', player.assists.toString()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildPreviousClubRow(Map<String, String> club) {
+  Widget _buildInfoSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(26),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: items,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(club['years'] ?? 'Years',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          Row(
-            children: [
-              Image.asset(club['logo'] ?? 'assets/icons/cavalier.png',
-                  height: 24),
-              const SizedBox(width: 8),
-              Text(club['name'] ?? 'Club Name',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-            ],
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
           ),
-          Text(club['games'] ?? 'Games',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );

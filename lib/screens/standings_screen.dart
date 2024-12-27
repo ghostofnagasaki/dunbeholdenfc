@@ -24,12 +24,12 @@ class StandingsScreen extends ConsumerWidget {
                 SizedBox(width: 32, child: Text('POS')),
                 SizedBox(width: 12),
                 Expanded(child: Text('CLUB')),
-                SizedBox(width: 40, child: Text('PTS')),
-                SizedBox(width: 40, child: Text('P')),
-                SizedBox(width: 40, child: Text('W')),
-                SizedBox(width: 40, child: Text('D')),
-                SizedBox(width: 40, child: Text('L')),
-                SizedBox(width: 40, child: Text('+/-')),
+                SizedBox(width: 35, child: Text('PTS')),
+                SizedBox(width: 35, child: Text('P')),
+                SizedBox(width: 35, child: Text('W')),
+                SizedBox(width: 35, child: Text('D')),
+                SizedBox(width: 35, child: Text('L')),
+                SizedBox(width: 35, child: Text('+/-')),
               ],
             ),
           ),
@@ -104,17 +104,19 @@ class StandingsScreen extends ConsumerWidget {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      standing.data()['teamName'],
+                                      _getShortTeamName(standing.data()['teamName']),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(
                                 standing.data()['stats']['points'].toString(),
                                 style: const TextStyle(
@@ -123,23 +125,23 @@ class StandingsScreen extends ConsumerWidget {
                               ),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(standing.data()['stats']['played'].toString()),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(standing.data()['stats']['won'].toString()),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(standing.data()['stats']['drawn'].toString()),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(standing.data()['stats']['lost'].toString()),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: 35,
                               child: Text(
                                 (standing.data()['stats']['goalDifference'] >= 0 ? '+' : '') +
                                     standing.data()['stats']['goalDifference'].toString(),
@@ -162,5 +164,29 @@ class StandingsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _getShortTeamName(String fullName) {
+    // First try to get first 3 letters of first word
+    final firstWord = fullName.split(' ').first;
+    if (firstWord.length >= 3) {
+      return firstWord.substring(0, 3).toUpperCase();
+    }
+    
+    // If first word is too short, use first letters of each word
+    final words = fullName.split(' ');
+    if (words.length >= 2) {
+      String abbr = '';
+      for (var word in words) {
+        if (word.isNotEmpty) {
+          abbr += word[0];
+        }
+        if (abbr.length >= 3) break;
+      }
+      return abbr.toUpperCase();
+    }
+    
+    // Fallback to full name if can't abbreviate
+    return fullName.toUpperCase();
   }
 } 

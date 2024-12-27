@@ -5,108 +5,113 @@ import '../models/player.dart';
 import '../providers/players_provider.dart';
 import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
+import 'player_info_screen.dart';
 
 class PlayerCard extends StatelessWidget {
-  final String number;
-  final String name;
-  final String position;
-  final String imageUrl;
+  final Player player;
 
   const PlayerCard({
     super.key,
-    required this.number,
-    required this.name,
-    required this.position,
-    required this.imageUrl,
+    required this.player,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF161B25),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Stack(
-                    children: [
-                      CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Image.asset(
-                          'assets/icons/dunbeholden.png',
-                          color: Colors.grey[700],
-                        ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/icons/dunbeholden.png',
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withAlpha(153),
-                              Colors.transparent,
-                              Colors.transparent,
-                              Colors.black.withAlpha(153),
-                            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlayerInfoScreen(player: player),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF161B25),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: Stack(
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: player.profileImage,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Image.asset(
+                            'assets/icons/dunbeholden.png',
+                            color: Colors.grey[700],
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/icons/dunbeholden.png',
+                            color: Colors.grey[700],
                           ),
                         ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withAlpha(153),
+                                Colors.transparent,
+                                Colors.transparent,
+                                Colors.black.withAlpha(153),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Text(
+                      player.jerseyNumber,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Text(
-                    number,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Text(
-                    position,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Text(
+                      player.position,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              name.toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+                ],
               ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(
+                player.name.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -211,10 +216,7 @@ class PlayersScreen extends ConsumerWidget {
       itemBuilder: (context, index) {
         final player = players[index];
         return PlayerCard(
-          number: player.jerseyNumber,
-          name: player.name,
-          position: player.position.toUpperCase(),
-          imageUrl: player.profileImage,
+          player: player,
         );
       },
     );

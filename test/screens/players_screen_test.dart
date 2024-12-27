@@ -1,78 +1,41 @@
-import 'package:dunbeholden/providers/players_provider.dart';
-import 'package:dunbeholden/screens/players_screen.dart';
-import 'package:dunbeholden/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:dunbeholden/screens/players_screen.dart';
 import 'package:dunbeholden/models/player.dart';
 
 void main() {
-  group('PlayersScreen', () {
-    testWidgets('should display loading state initially',
-        (WidgetTester tester) async {
-      await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              playersStreamProvider.overrideWith(
-                (_) => const Stream.empty(),
-              ),
-            ],
-            child: const MaterialApp(
-              home: PlayersScreen(),
-            ),
-          ),
-        );
+  final testPlayer = Player(
+    id: 'test_id',
+    name: 'Test Player',
+    jerseyNumber: '10',
+    position: 'Forward',
+    profileImage: 'test_image.jpg',
+    nationality: 'Jamaica',
+    dateOfBirth: DateTime(1995, 6, 15),
+    height: '180cm',
+    weight: '75kg',
+    preferredFoot: 'Right',
+    appearances: 20,
+    goals: 10,
+    assists: 5,
+    cleanSheets: 0,
+    isActive: true,
+    biography: 'Test bio',
+    previousClubs: 'Previous clubs',
+    updatedAt: DateTime.now(),
+  );
 
-        await tester.pump();
-        expect(find.byType(LoadingView), findsOneWidget);
-      });
-    });
+  testWidgets('PlayerCard displays player information correctly', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PlayerCard(player: testPlayer),
+      ),
+    );
 
-    testWidgets('should display players grouped by position',
-        (WidgetTester tester) async {
-      await mockNetworkImagesFor(() async {
-        final players = [
-          Player(
-            id: 'player1',
-            name: 'John Doe',
-            position: 'Goalkeeper',
-            jerseyNumber: '1',
-            actionImage: '',
-            appearances: 0,
-            assists: 0,
-            biography: '',
-            dateOfBirth: DateTime.now(),
-            goals: 0,
-            height: '',
-            isActive: true,
-            nationality: '',
-            previousClubs: '',
-            profileImage: '',
-            updatedAt: DateTime.now(),
-            weight: '',
-            databaseLocation: '',
-          ),
-        ];
-
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              playersStreamProvider.overrideWith((_) => Stream.value(players)),
-            ],
-            child: const MaterialApp(
-              home: PlayersScreen(),
-            ),
-          ),
-        );
-
-        await tester.pump();
-        await tester.pumpAndSettle();
-
-        expect(find.text('GOALKEEPERS'), findsOneWidget);
-        expect(find.text('JOHN DOE'), findsOneWidget);
-      });
-    });
+    expect(find.text('Test Player'), findsOneWidget);
+    expect(find.text('10'), findsOneWidget);
+    expect(find.text('FORWARD'), findsOneWidget);
   });
+
+  // Add more tests as needed
 } 

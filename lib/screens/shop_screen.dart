@@ -193,7 +193,7 @@ class ShopScreen extends StatelessWidget {
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      color: Colors.white.withAlpha(20),
+      color: Colors.white.withAlpha(51),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -216,7 +216,7 @@ class ShopScreen extends StatelessWidget {
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            color: Colors.white.withAlpha(200),
+            color: Colors.white.withAlpha(204),
             fontSize: 14,
           ),
         ),

@@ -42,9 +42,12 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
-        
         centerTitle: true,
-        title: const Text("Dunbeholden FC"),
+        title: Image.asset(
+          'assets/icons/dunbeholden_white.png',
+          height: 40,
+          fit: BoxFit.contain,
+        ),
         actions: [
           IconButton(
             onPressed: () {
