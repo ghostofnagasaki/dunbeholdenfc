@@ -36,14 +36,7 @@ class MyDBNScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 28),
-            onPressed: () {
-              // Handle settings
-            },
-          ),
-        ],
+        
       ),
       body: SingleChildScrollView(
         child: Column(
