@@ -107,7 +107,7 @@ void main() {
 
     final Image image = tester.widget(imageFinder);
     expect(image.fit, equals(BoxFit.cover));
-    expect((image.image as AssetImage).assetName, equals('assets/images/150x150.png'));
+    expect((image.image as AssetImage).assetName, equals('assets/images/shop_banner.jpg'));
   });
 
   testWidgets('Category tiles have correct styling', (tester) async {

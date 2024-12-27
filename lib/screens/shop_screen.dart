@@ -42,7 +42,7 @@ class ShopScreen extends StatelessWidget {
             Stack(
               children: [
                 Image.asset(
-                  'assets/images/150x150.png',
+                  'assets/images/shop_banner.jpg',
                   height: 300,
                   width: double.infinity,
                   fit: BoxFit.cover,
