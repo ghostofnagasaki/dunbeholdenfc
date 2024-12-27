@@ -35,7 +35,7 @@ class ShopScreen extends StatelessWidget {
             Stack(
               children: [
                 Image.asset(
-                  'assets/images/shop_banner.jpg',
+                  'assets/images/150x150.png',
                   height: 400,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -48,7 +48,7 @@ class ShopScreen extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        AppColors.primary.withOpacity(0.8),
+                        AppColors.primary.withAlpha(204),
                       ],
                     ),
                   ),

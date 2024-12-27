@@ -1,6 +1,7 @@
 import 'package:mockito/mockito.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// ignore: subtype_of_sealed_class
 class MockQueryDocumentSnapshot extends Mock implements QueryDocumentSnapshot<Map<String, dynamic>> {
   final Map<String, dynamic> _data;
   final String _id;
@@ -12,8 +13,15 @@ class MockQueryDocumentSnapshot extends Mock implements QueryDocumentSnapshot<Ma
 
   @override
   String get id => _id;
+
+  @override
+  SnapshotMetadata get metadata => throw UnimplementedError();
+
+  @override
+  DocumentReference<Map<String, dynamic>> get reference => throw UnimplementedError();
 }
 
+// ignore: subtype_of_sealed_class
 class MockStandingDocumentSnapshot extends MockQueryDocumentSnapshot {
   MockStandingDocumentSnapshot({
     required String teamName,

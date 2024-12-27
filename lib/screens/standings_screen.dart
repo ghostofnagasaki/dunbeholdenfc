@@ -47,11 +47,11 @@ class StandingsScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withAlpha(51),
                         ),
                         top: index == 0
                             ? BorderSide(
-                                color: Colors.grey.withOpacity(0.2),
+                                color: Colors.grey.withAlpha(51),
                               )
                             : BorderSide.none,
                       ),

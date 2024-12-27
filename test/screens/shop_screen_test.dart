@@ -4,6 +4,7 @@ import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:dunbeholden/screens/shop_screen.dart';
 
+
 class MockUrlLauncher extends UrlLauncherPlatform {
   String? lastLaunchedUrl;
 
@@ -33,8 +34,11 @@ void main() {
   const admiralUrl = 'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071';
 
   Future<void> pumpShopScreen(WidgetTester tester) async {
-    tester.binding.window.physicalSizeTestValue = const Size(1440, 2560);
-    tester.binding.window.devicePixelRatioTestValue = 1.0;
+    tester.view.physicalSize = const Size(1440, 2560);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.reset();
+    });
     
     await tester.pumpWidget(
       const MaterialApp(home: ShopScreen()),
@@ -103,7 +107,7 @@ void main() {
 
     final Image image = tester.widget(imageFinder);
     expect(image.fit, equals(BoxFit.cover));
-    expect((image.image as AssetImage).assetName, equals('assets/images/shop_banner.jpg'));
+    expect((image.image as AssetImage).assetName, equals('assets/images/150x150.png'));
   });
 
   testWidgets('Category tiles have correct styling', (tester) async {
