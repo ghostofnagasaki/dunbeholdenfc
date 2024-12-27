@@ -8,31 +8,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:network_image_mock/network_image_mock.dart';
-import '../helpers/mocks.dart';
+
 import 'package:dunbeholden/models/match.dart';
 import 'package:dunbeholden/models/club.dart';
+
+
 
 void main() {
   group('MatchesScreen', () {
     testWidgets('should display loading state initially',
         (WidgetTester tester) async {
-      await mockNetworkImagesFor(() async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              matchesStreamProvider.overrideWith((_) => Stream.empty()),
-              clubsProvider.overrideWith((_) => Future.value({})),
-              standingsStreamProvider.overrideWith((_) => Stream.empty()),
-            ],
-            child: const MaterialApp(
-              home: MatchesScreen(),
-            ),
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            home: MatchesScreen(),
           ),
-        );
+        ),
+      );
 
-        await tester.pump();
-        expect(find.byType(LoadingView), findsOneWidget);
-      });
+      await tester.pump();
+      expect(find.byType(LoadingView), findsOneWidget);
     });
 
     testWidgets('should display matches when data is available',
@@ -77,7 +72,6 @@ void main() {
             overrides: [
               matchesStreamProvider.overrideWith((_) => Stream.value(matches)),
               clubsProvider.overrideWith((_) => Future.value(clubs)),
-              standingsStreamProvider.overrideWith((_) => Stream.empty()),
             ],
             child: const MaterialApp(
               home: MatchesScreen(),
@@ -97,26 +91,12 @@ void main() {
 
     testWidgets('should switch tabs correctly', (WidgetTester tester) async {
       await mockNetworkImagesFor(() async {
-        final mockStandings = [
-          MockStandingDocumentSnapshot(
-            teamName: 'Test Team',
-            teamLogo: 'test_logo.png',
-            position: 1,
-            points: 30,
-            played: 15,
-            won: 9,
-            drawn: 3,
-            lost: 3,
-            goalDifference: 10,
-          ),
-        ];
-
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
               matchesStreamProvider.overrideWith((_) => Stream.value([])),
               clubsProvider.overrideWith((_) => Future.value({})),
-              standingsStreamProvider.overrideWith((_) => Stream.value(mockStandings)),
+              standingsStreamProvider.overrideWith((_) => Stream.value([])),
             ],
             child: const MaterialApp(
               home: MatchesScreen(),
