@@ -16,7 +16,7 @@ void main() {
           ProviderScope(
             overrides: [
               staffStreamProvider.overrideWith(
-                (_) => Stream.empty(),
+                (_) => const Stream.empty(),
               ),
             ],
             child: const MaterialApp(

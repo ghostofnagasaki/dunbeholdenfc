@@ -15,7 +15,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              standingsStreamProvider.overrideWith((_) => Stream.empty()),
+              standingsStreamProvider.overrideWith((_) => const Stream.empty()),
             ],
             child: const MaterialApp(
               home: StandingsScreen(),

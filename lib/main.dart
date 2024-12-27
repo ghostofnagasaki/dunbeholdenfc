@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'widgets/custom_bottom_navigation_bar.dart';
 import 'screens/news_detail_screen.dart';
+import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,10 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dunbeholden FC',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: AppTheme.theme,
       home: const MainScreen(),
       onGenerateRoute: (settings) {
         if (settings.name == '/news-detail') {

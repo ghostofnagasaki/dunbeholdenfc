@@ -19,8 +19,8 @@ class StandingsScreen extends ConsumerWidget {
           Container(
             color: const Color(0xFFEEEEEE),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 SizedBox(width: 32, child: Text('POS')),
                 SizedBox(width: 12),
                 Expanded(child: Text('CLUB')),
