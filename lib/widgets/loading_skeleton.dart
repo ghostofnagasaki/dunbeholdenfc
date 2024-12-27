@@ -1,24 +1,67 @@
 import 'package:flutter/material.dart';
 
-class LoadingSkeleton extends StatelessWidget {
-  final double width;
-  final double height;
-
+class LoadingSkeleton extends StatefulWidget {
   const LoadingSkeleton({
     super.key,
-    required this.width,
-    required this.height,
+    this.height,
+    this.width,
+    this.borderRadius = 8,
   });
+
+  final double? height;
+  final double? width;
+  final double borderRadius;
+
+  @override
+  State<LoadingSkeleton> createState() => _LoadingSkeletonState();
+}
+
+class _LoadingSkeletonState extends State<LoadingSkeleton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+
+    _animation = Tween<double>(begin: -2, end: 2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          height: widget.height,
+          width: widget.width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment(_animation.value, 0),
+              end: const Alignment(2, 0),
+              colors: const [
+                Color(0xFFEEEEEE),
+                Color(0xFFF5F5F5),
+                Color(0xFFEEEEEE),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
