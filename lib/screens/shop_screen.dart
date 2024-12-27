@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../constants/app_colors.dart';
+
+import '../constants/colors.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -21,11 +22,17 @@ class ShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primaryBlue,
       appBar: AppBar(
         title: const Text(
           'Club Shop',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -36,19 +43,19 @@ class ShopScreen extends StatelessWidget {
               children: [
                 Image.asset(
                   'assets/images/150x150.png',
-                  height: 400,
+                  height: 300,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
                 Container(
-                  height: 400,
+                  height: 300,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        AppColors.primary.withAlpha(204),
+                        AppColors.primaryBlue.withAlpha(230),
                       ],
                     ),
                   ),
@@ -56,6 +63,7 @@ class ShopScreen extends StatelessWidget {
                 Positioned(
                   bottom: 20,
                   left: 20,
+                  right: 20,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -63,24 +71,30 @@ class ShopScreen extends StatelessWidget {
                         'New Collection',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _launchWebStore,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primary,
+                          foregroundColor: AppColors.primaryBlue,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: const Text(
                           'Shop Now',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -88,23 +102,23 @@ class ShopScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Main Categories
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Shop by Category',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   ListView(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -139,14 +153,16 @@ class ShopScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // Visit Store Button
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ElevatedButton(
                 onPressed: () => _launchUrl('https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071'),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primaryBlue,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -161,7 +177,7 @@ class ShopScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -176,32 +192,38 @@ class ShopScreen extends StatelessWidget {
     String? url,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
+      color: Colors.white.withAlpha(20),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
+        contentPadding: const EdgeInsets.all(20),
         leading: Icon(
           icon,
           size: 32,
-          color: AppColors.primary,
+          color: AppColors.primaryBlue,
         ),
         title: Text(
           title,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: AppColors.textPrimary,
+            fontSize: 18,
+            color: Colors.white,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: Colors.white.withAlpha(200),
+            fontSize: 14,
           ),
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
           size: 16,
-          color: AppColors.primary,
+          color: AppColors.primaryBlue,
         ),
         onTap: () => url != null ? _launchUrl(url) : _launchWebStore(),
       ),
