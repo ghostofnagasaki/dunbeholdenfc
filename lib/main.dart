@@ -17,7 +17,11 @@ void main() async {
     debugPrint('Firebase initialization error: $e');
   }
   
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/player.dart';
-import '../providers/players_provider.dart';
+import '../models/staff.dart';
+import '../providers/staff_provider.dart';
 import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
 
-class PlayerCard extends StatelessWidget {
-  final String number;
+class StaffCard extends StatelessWidget {
   final String name;
-  final String position;
+  final String role;
   final String imageUrl;
 
-  const PlayerCard({
+  const StaffCard({
     super.key,
-    required this.number,
     required this.name,
-    required this.position,
+    required this.role,
     required this.imageUrl,
   });
 
@@ -68,21 +66,9 @@ class PlayerCard extends StatelessWidget {
                 ),
                 Positioned(
                   top: 8,
-                  left: 8,
-                  child: Text(
-                    number,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
                   right: 8,
                   child: Text(
-                    position,
+                    role.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -112,20 +98,19 @@ class PlayerCard extends StatelessWidget {
   }
 }
 
-class PlayersScreen extends ConsumerWidget {
-  const PlayersScreen({super.key});
+class StaffScreen extends ConsumerWidget {
+  const StaffScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playersAsync = ref.watch(playersStreamProvider);
+    final staffAsync = ref.watch(staffStreamProvider);
 
-    return playersAsync.when(
-      data: (players) {
-        // Group players by position
-        final goalkeepers = players.where((p) => p.position == 'Goalkeeper').toList();
-        final defenders = players.where((p) => p.position == 'Defender').toList();
-        final midfielders = players.where((p) => p.position == 'Midfielder').toList();
-        final forwards = players.where((p) => p.position == 'Forward').toList();
+    return staffAsync.when(
+      data: (staffList) {
+        // Group staff by role
+        final coaches = staffList.where((s) => s.role == 'Coach').toList();
+        final medical = staffList.where((s) => s.role == 'Medical').toList();
+        final other = staffList.where((s) => s.role == 'Other').toList();
 
         return SingleChildScrollView(
           child: Padding(
@@ -133,9 +118,9 @@ class PlayersScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (goalkeepers.isNotEmpty) ...[
+                if (coaches.isNotEmpty) ...[
                   const Text(
-                    'GOALKEEPERS',
+                    'COACHING STAFF',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -143,12 +128,12 @@ class PlayersScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildPlayerGrid(goalkeepers),
+                  _buildStaffGrid(coaches),
                   const SizedBox(height: 24),
                 ],
-                if (defenders.isNotEmpty) ...[
+                if (medical.isNotEmpty) ...[
                   const Text(
-                    'DEFENDERS',
+                    'MEDICAL STAFF',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -156,12 +141,12 @@ class PlayersScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildPlayerGrid(defenders),
+                  _buildStaffGrid(medical),
                   const SizedBox(height: 24),
                 ],
-                if (midfielders.isNotEmpty) ...[
+                if (other.isNotEmpty) ...[
                   const Text(
-                    'MIDFIELDERS',
+                    'OTHER STAFF',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -169,20 +154,7 @@ class PlayersScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildPlayerGrid(midfielders),
-                  const SizedBox(height: 24),
-                ],
-                if (forwards.isNotEmpty) ...[
-                  const Text(
-                    'FORWARDS',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildPlayerGrid(forwards),
+                  _buildStaffGrid(other),
                 ],
               ],
             ),
@@ -192,12 +164,12 @@ class PlayersScreen extends ConsumerWidget {
       loading: () => const LoadingView(),
       error: (error, stack) => ErrorView(
         message: error.toString(),
-        onRetry: () => ref.refresh(playersStreamProvider),
+        onRetry: () => ref.refresh(staffStreamProvider),
       ),
     );
   }
 
-  Widget _buildPlayerGrid(List<Player> players) {
+  Widget _buildStaffGrid(List<Staff> staffList) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -207,16 +179,15 @@ class PlayersScreen extends ConsumerWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
-      itemCount: players.length,
+      itemCount: staffList.length,
       itemBuilder: (context, index) {
-        final player = players[index];
-        return PlayerCard(
-          number: player.jerseyNumber,
-          name: player.name,
-          position: player.position.toUpperCase(),
-          imageUrl: player.profileImage,
+        final staff = staffList[index];
+        return StaffCard(
+          name: staff.name,
+          role: staff.role,
+          imageUrl: staff.image,
         );
       },
     );
   }
-}
+} 
