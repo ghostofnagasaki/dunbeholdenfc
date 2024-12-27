@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/colors.dart';
 import '../screens/home_screen.dart';
+import '../screens/matches_screen.dart';
 import '../screens/shop_screen.dart';
 
 import '../screens/mydbn_screen.dart';
@@ -18,7 +19,7 @@ class MainScreenState extends ConsumerState<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    // const MatchesScreen(),
+    const MatchesScreen(),
     const ShopScreen(),
     const MyDBNScreen(),
   ];
