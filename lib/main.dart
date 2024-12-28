@@ -5,28 +5,47 @@ import 'firebase_options.dart';
 import 'widgets/custom_bottom_navigation_bar.dart';
 import 'screens/news_detail_screen.dart';
 import 'config/theme.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
+    // Initialize Firebase first
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     debugPrint('Firebase initialized successfully');
+
+    // Get FCM token after Firebase is initialized
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    debugPrint('FCM Token: $fcmToken');
+
+    // Initialize notifications
+    final notificationService = NotificationService();
+    await notificationService.initialize();
+
+    runApp(
+      ProviderScope(
+        child: MyApp(notificationService: notificationService),
+      ),
+    );
   } catch (e) {
-    debugPrint('Firebase initialization error: $e');
+    debugPrint('Initialization error: $e');
+    // Still run the app even if there's an error
+    runApp(
+      const ProviderScope(
+        child: MyApp(notificationService: null),
+      ),
+    );
   }
-  
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.notificationService});
+
+  final NotificationService? notificationService;
 
   @override
   Widget build(BuildContext context) {

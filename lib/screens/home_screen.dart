@@ -314,130 +314,88 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildRegularPostCard(Post post) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(
-        context,
-        '/news-detail',
-        arguments: post.id,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(26),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withAlpha(26),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (post.image.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: CachedNetworkImage(
-                  imageUrl: post.image,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (post.image.isNotEmpty)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              child: CachedNetworkImage(
+                imageUrl: post.image,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
                   height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.image,
+                      size: 48,
+                      color: Colors.grey[300],
                     ),
                   ),
                 ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Men's Team • ${_formatDate(post.date)}",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryBlue,
+                errorWidget: (context, url, error) => Container(
+                  height: 200,
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.grey[300],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.summary,
-                    style: TextStyle(color: Colors.grey[800]),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                ),
               ),
             ),
-            if (post.image.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(12),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "Men's Team • ${_formatDate(post.date)}",
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                  ],
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: post.image,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey[300],
-                      ),
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  post.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlue,
                   ),
                 ),
-              ),
-          ],
-        ),
+                const SizedBox(height: 8),
+                Text(
+                  post.summary,
+                  style: TextStyle(color: Colors.grey[800]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
