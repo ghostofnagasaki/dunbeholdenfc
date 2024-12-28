@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../constants/colors.dart';
 import '../constants/styles.dart';
 import '../widgets/benefit_item.dart';
+import '../screens/membership_onboarding_screen.dart';
 
 class MyDBNScreen extends ConsumerWidget {
   const MyDBNScreen({super.key});
@@ -144,6 +145,23 @@ class MyDBNScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 32),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MembershipOnboardingScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: const Text(
+                'Become a Member',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
           ],
         ),
       ),

@@ -74,7 +74,7 @@ class NotificationService {
     debugPrint('Received notification: ${message.notification?.title}');
     debugPrint('Notification data: ${message.data}');
 
-    final androidDetails = AndroidNotificationDetails(
+    const androidDetails = AndroidNotificationDetails(
       'dunbeholden_channel',
       'Dunbeholden Updates',
       channelDescription: 'Important updates from Dunbeholden FC',
@@ -90,7 +90,7 @@ class NotificationService {
       presentAlert: true,
     );
 
-    var details = NotificationDetails(
+    var details = const NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
