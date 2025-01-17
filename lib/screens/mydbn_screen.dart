@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 import '../constants/colors.dart';
 import '../constants/styles.dart';
@@ -10,16 +10,6 @@ import '../screens/membership_onboarding_screen.dart';
 class MyDBNScreen extends ConsumerWidget {
   const MyDBNScreen({super.key});
 
-  void _navigateToLogin(BuildContext context) async {
-    final Uri url = Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSe1j67D5Yw6G8Mfr84NSJbvdkm_e4-H-j_a04JZJfwWl6-7qw/viewform');
-    if (!await launchUrl(url)) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not launch form. Please try again later.')),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,7 +91,12 @@ class MyDBNScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 30),
                       ElevatedButton(
-                        onPressed: () => _navigateToLogin(context),
+                        onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MembershipOnboardingScreen()),
+                );
+              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primaryBlue,

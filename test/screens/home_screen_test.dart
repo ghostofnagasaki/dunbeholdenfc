@@ -14,6 +14,7 @@ void main() {
     title: 'Regular Post',
     content: 'Test Post Content',
     summary: 'Test Summary',
+    imageBlurHash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
     category: 'News',
     date: DateTime(2024, 1, 1, 14, 30),
     image: 'https://example.com/post.jpg',

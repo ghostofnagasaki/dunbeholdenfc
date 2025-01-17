@@ -16,16 +16,17 @@ class StandingsRepository {
           .orderBy('stats.position')
           .snapshots()
           .map((snapshot) {
-            debugPrint('Received ${snapshot.docs.length} standings documents');
+            // debugPrint('Received ${snapshot.docs.length} standings documents');
             return snapshot.docs.map((doc) {
               final data = doc.data();
-              debugPrint('Processing standing document: ${doc.id}');
+              // debugPrint('Processing standing document: ${doc.id}');
               return TeamStanding.fromMap(data);
             }).toList();
           });
-    } catch (e, stack) {
-      debugPrint('Error getting standings: $e\n$stack');
+    } catch (e) {
+      // debugPrint('Error getting standings: $e\n$stack');
       rethrow;
     }
   }
+
 } 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/colors.dart';
 import 'delete_account_screen.dart';
@@ -58,24 +57,7 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
 
-            // Membership Section
-            _buildSection(
-              'Membership',
-              [
-                _buildSettingsItem(
-                  context,
-                  'Join DBN',
-                  Icons.card_membership,
-                  onTap: _launchURL,
-                  showDivider: true,
-                ),
-                _buildSettingsItem(
-                  context,
-                  'Benefits',
-                  Icons.star_outline,
-                ),
-              ],
-            ),
+            
 
             // Support Section
             _buildSection(
@@ -237,12 +219,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _launchURL() async {
-    final Uri url = Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSe1j67D5Yw6G8Mfr84NSJbvdkm_e4-H-j_a04JZJfwWl6-7qw/viewform');
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
-  }
+
 }
 
 class _SocialIcon extends StatelessWidget {

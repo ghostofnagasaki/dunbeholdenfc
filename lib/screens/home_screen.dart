@@ -3,26 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/post_provider.dart';
 import '../constants/colors.dart';
+import '../services/performance_monitor.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'settings_screen.dart';
-import '../widgets/loading_skeleton.dart';
+import '../widgets/optimized_card.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/error_view.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  final DateTime Function() getCurrentTime;
+  final DateTime Function()? getCurrentTime;
 
   const HomeScreen({
     super.key,
-    this.getCurrentTime = DateTime.now,
+    this.getCurrentTime,
   });
 
   @override
-  ConsumerState<HomeScreen> createState() => HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _formatDate(DateTime date) {
-    final now = widget.getCurrentTime();
+    final now = widget.getCurrentTime?.call() ?? DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
@@ -37,16 +40,63 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  void _preloadImages(List<Post> posts) {
+    // Limit preloading to first few posts
+    final limitedPosts = posts.take(5).toList();
+    for (final post in limitedPosts) {
+      if (post.image.isNotEmpty) {
+        precacheImage(
+          CachedNetworkImageProvider(
+            post.image,
+            maxHeight: 800, // Limit image size
+            maxWidth: 800,
+          ),
+          context,
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    // Clear memory when leaving the screen
+    imageCache.clear();
+    imageCache.clearLiveImages();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer non-critical operations
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeScreen();
+    });
+  }
+
+  void _initializeScreen() {
+    ref.read(postsStreamProvider.stream).first.then((posts) {
+      if (mounted) {
+        _preloadImages(posts);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen(postsStreamProvider, (previous, next) {
+      next.whenData((posts) => _preloadImages(posts));
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
         centerTitle: true,
         title: Image.asset(
-          'assets/icons/dunbeholden_white.png',
+          'assets/icons/dunbeholden.png',
           height: 40,
           fit: BoxFit.contain,
+          color: Colors.white,
         ),
         actions: [
           IconButton(
@@ -62,11 +112,10 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          // Refresh the posts stream
-          // ignore: unused_result
-          ref.refresh(postsStreamProvider);
-        },
+        onRefresh: () => PerformanceMonitor.trackOperation(
+          'refresh_news_feed',
+          () => ref.refresh(postsStreamProvider.future),
+        ),
         color: AppColors.primaryBlue,
         child: _buildNewsFeed(),
       ),
@@ -74,125 +123,50 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildNewsFeed() {
-    final postsState = ref.watch(postsStreamProvider);
+    return Consumer(
+      builder: (context, ref, _) {
+        return ref.watch(postsStreamProvider).when(
+          data: (posts) {
+            if (posts.isEmpty) {
+              return _buildEmptyState();
+            }
 
-    return postsState.when(
-      data: (posts) {
-        if (posts.isEmpty) {
-          return ListView( // Wrap empty state in ListView for RefreshIndicator to work
-            physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling even when empty
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.7, // Center the empty state
-                child: _buildEmptyState(),
-              ),
-            ],
-          );
-        }
+            final announcements = posts.where((post) => 
+              post.category.toLowerCase() == 'announcement').toList();
+            final otherPosts = posts.where((post) => 
+              post.category.toLowerCase() != 'announcement').toList();
 
-        final announcements = posts.where((post) => 
-          post.category.toLowerCase() == 'announcement').toList();
-        final otherPosts = posts.where((post) => 
-          post.category.toLowerCase() != 'announcement').toList();
+            // Combine all posts into a single list
+            final allPosts = [...announcements, ...otherPosts];
 
-        return ListView(
-          physics: const AlwaysScrollableScrollPhysics(), // Enable scrolling
-          children: [
-            if (announcements.isNotEmpty)
-              _buildAnnouncementCard(announcements.first),
-            ...otherPosts.map((post) => _buildRegularPostCard(post)),
-          ],
+            return ListView.builder(
+              itemCount: allPosts.length,
+              cacheExtent: 1000,
+              addAutomaticKeepAlives: false,
+              addRepaintBoundaries: true,
+              itemBuilder: (context, index) {
+                final post = allPosts[index];
+                return RepaintBoundary(
+                  child: index < announcements.length
+                    ? _buildAnnouncementCard(context, post)
+                    : OptimizedCard(
+                        child: _buildRegularPostCard(context, post),
+                      ),
+                );
+              },
+            );
+          },
+          loading: () => const LoadingView(),
+          error: (error, stack) => ErrorView(
+            message: error.toString(),
+            onRetry: () => ref.refresh(postsStreamProvider),
+          ),
         );
       },
-      loading: () => ListView( // Wrap loading state in ListView for RefreshIndicator to work
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(), // Disable scrolling for inner content
-            child: Column(
-              children: [
-                const LoadingSkeleton(
-                  height: 500,
-                ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withAlpha(26),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          LoadingSkeleton(
-                            height: 200,
-                            borderRadius: 12,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                LoadingSkeleton(
-                                  width: 150,
-                                  height: 14,
-                                ),
-                                SizedBox(height: 12),
-                                LoadingSkeleton(
-                                  height: 24,
-                                ),
-                                SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: LoadingSkeleton(height: 16),
-                                    ),
-                                    SizedBox(width: 16),
-                                    Expanded(
-                                      child: LoadingSkeleton(height: 16),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      error: (error, stack) => ListView( // Wrap error state in ListView
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.7,
-            child: Center(
-              child: Text('Error: $error'),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildAnnouncementCard(Post post) {
+  Widget _buildAnnouncementCard(BuildContext context, Post post) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
@@ -313,91 +287,100 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildRegularPostCard(Post post) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withAlpha(26),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+  Widget _buildRegularPostCard(BuildContext context, Post post) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/news-detail',
+        arguments: post.id,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (post.image.isNotEmpty)
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: CachedNetworkImage(
-                imageUrl: post.image,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(26),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (post.image.isNotEmpty)
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: CachedNetworkImage(
+                  imageUrl: post.image,
                   height: 200,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: Icon(
-                      Icons.image,
-                      size: 48,
-                      color: Colors.grey[300],
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  memCacheWidth: 800,
+                  fadeInDuration: const Duration(milliseconds: 300),
+                  placeholder: (context, url) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
                     ),
                   ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  height: 200,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.grey[300],
+                  errorWidget: (context, url, error) => Container(
+                    height: 200,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.grey[300],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "Men's Team • ${_formatDate(post.date)}",
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  post.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryBlue,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Men's Team • ${_formatDate(post.date)}",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    post.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    post.summary,
+                    style: TextStyle(color: Colors.grey[800]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  post.summary,
-                  style: TextStyle(color: Colors.grey[800]),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
+              ),
+          ],
       ),
-    );
+    )
+  );
   }
 
   Widget _buildEmptyState() {

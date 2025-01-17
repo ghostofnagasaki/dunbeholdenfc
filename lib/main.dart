@@ -1,51 +1,95 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
+
+
 import 'widgets/custom_bottom_navigation_bar.dart';
 import 'screens/news_detail_screen.dart';
 import 'config/theme.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'services/notification_service.dart';
+import 'package:firebase_performance/firebase_performance.dart';
+import 'services/image_cache_service.dart';
+import 'services/shader_warmer.dart';
+import 'dart:async';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    // Initialize Firebase first
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    debugPrint('Firebase initialized successfully');
+    // More aggressive memory limits
+    imageCache.maximumSize = 50;
+    imageCache.maximumSizeBytes = 30 * 1024 * 1024;
 
-    // Get FCM token after Firebase is initialized
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    debugPrint('FCM Token: $fcmToken');
+    try {
+      await Firebase.initializeApp();
+      
+      // Initialize Crashlytics
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+      
+      // Initialize notifications and request permissions
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      
+      // Catch errors that happen outside of Flutter
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
 
-    // Initialize notifications
-    final notificationService = NotificationService();
-    await notificationService.initialize();
+      // Warm up shaders before showing the app
+      await ShaderWarmer.warmupShaders();
+      
+      // Only enable performance monitoring in non-test environment
+      if (!kIsWeb && !Platform.environment.containsKey('FLUTTER_TEST')) {
+        await FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
+      }
 
-    runApp(
-      ProviderScope(
-        child: MyApp(notificationService: notificationService),
-      ),
-    );
-  } catch (e) {
-    debugPrint('Initialization error: $e');
-    // Still run the app even if there's an error
-    runApp(
-      const ProviderScope(
-        child: MyApp(notificationService: null),
-      ),
-    );
-  }
+      // Pre-cache common images
+      await ImageCacheService.preCacheImages([
+        'assets/icons/dunbeholden.png',
+        // Add other frequently used images
+      ]);
+
+      runApp(
+        ProviderScope(
+          child: MyApp(notificationService: notificationService),
+        ),
+      );
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack);
+      debugPrint('Initialization error: $e');
+      runApp(const ProviderScope(child: MyApp()));
+    }
+  }, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, this.notificationService});
-
   final NotificationService? notificationService;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _requestNotificationPermissions();
+  }
+
+  Future<void> _requestNotificationPermissions() async {
+    if (widget.notificationService != null) {
+      await widget.notificationService!.requestPermissions();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

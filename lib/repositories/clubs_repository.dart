@@ -15,16 +15,16 @@ class ClubsRepository {
           .where('isActive', isEqualTo: true)
           .get();
           
-      debugPrint('Got ${snapshot.docs.length} clubs');
+      // debugPrint('Got ${snapshot.docs.length} clubs');
       
       Map<String, Club> clubs = {};
       for (var doc in snapshot.docs) {
         try {
           final data = doc.data();
-          debugPrint('Club data for ${doc.id}: $data');
+          // debugPrint('Club data for ${doc.id}: $data');
           clubs[doc.id] = Club.fromMap(doc.id, data);
-        } catch (e, stack) {
-          debugPrint('Error parsing club ${doc.id}: $e\n$stack');
+        } catch (e) {
+          // debugPrint('Error parsing club ${doc.id}: $e\n$stack');
           rethrow;
         }
       }

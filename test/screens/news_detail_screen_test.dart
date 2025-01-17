@@ -20,8 +20,9 @@ void main() {
     seoDescription: 'Test SEO Description',
     slug: 'test-post',
     status: 'published',
-    tags: ['test', 'news'],
+    tags: ['test', 'news'], imageBlurHash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
   );
+
 
   testWidgets('NewsDetailScreen shows loading state', (WidgetTester tester) async {
     await mockNetworkImagesFor(() async {

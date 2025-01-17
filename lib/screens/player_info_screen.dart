@@ -21,7 +21,7 @@ class PlayerInfoScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 350,
             pinned: true,
-            backgroundColor: AppColors.primaryBlue,
+        backgroundColor: AppColors.primaryBlue,
             leading: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -43,7 +43,7 @@ class PlayerInfoScreen extends StatelessWidget {
                 children: [
                   CachedNetworkImage(
                     imageUrl: player.profileImage,
-                    fit: BoxFit.cover,
+                          fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(color: Colors.white),
                     ),
@@ -51,15 +51,15 @@ class PlayerInfoScreen extends StatelessWidget {
                       Icons.person,
                       size: 100,
                       color: Colors.white54,
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
+                        ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
                           Colors.transparent,
                           Colors.transparent,
                           Colors.transparent,
@@ -83,17 +83,17 @@ class PlayerInfoScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                      ],
+                    ),
+                  ),
+                ),
 
           // Player Details
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Name and Number
                   Row(
@@ -166,7 +166,7 @@ class PlayerInfoScreen extends StatelessWidget {
                   // Previous Clubs if available
                   if (player.previousClubs.isNotEmpty)
                     _buildInfoSection('Previous Clubs', [
-                      Padding(
+            Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Text(
                           player.previousClubs,
@@ -190,10 +190,10 @@ class PlayerInfoScreen extends StatelessWidget {
                   ]),
                 ],
               ),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 

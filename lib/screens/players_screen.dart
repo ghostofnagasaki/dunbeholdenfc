@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/player.dart';
 import '../providers/players_provider.dart';
 import '../widgets/error_view.dart';
+import '../widgets/lazy_load_list.dart';
 import '../widgets/loading_view.dart';
+import '../widgets/optimized_card.dart';
 import 'player_info_screen.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -122,76 +124,47 @@ class PlayersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playersAsync = ref.watch(playersStreamProvider);
-
-    return playersAsync.when(
+    return ref.watch(playersStreamProvider).when(
       data: (players) {
-        // Group players by position
-        final goalkeepers = players.where((p) => p.position == 'Goalkeeper').toList();
-        final defenders = players.where((p) => p.position == 'Defender').toList();
-        final midfielders = players.where((p) => p.position == 'Midfielder').toList();
-        final forwards = players.where((p) => p.position == 'Forward').toList();
-
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+        final groupedPlayers = _groupPlayersByPosition(players);
+        
+        return LazyLoadListView(
+          items: groupedPlayers.entries.toList(),
+          initialLoadCount: 2,
+          loadMoreCount: 1,
+          itemBuilder: (context, index) {
+            final entry = groupedPlayers.entries.elementAt(index);
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (goalkeepers.isNotEmpty) ...[
-                  const Text(
-                    'GOALKEEPERS',
-                    style: TextStyle(
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    entry.key.toUpperCase(),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildPlayerGrid(goalkeepers),
-                  const SizedBox(height: 24),
-                ],
-                if (defenders.isNotEmpty) ...[
-                  const Text(
-                    'DEFENDERS',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
+                ),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
-                  const SizedBox(height: 16),
-                  _buildPlayerGrid(defenders),
-                  const SizedBox(height: 24),
-                ],
-                if (midfielders.isNotEmpty) ...[
-                  const Text(
-                    'MIDFIELDERS',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
+                  itemCount: entry.value.length,
+                  itemBuilder: (context, index) => OptimizedCard(
+                    child: PlayerCard(player: entry.value[index]),
                   ),
-                  const SizedBox(height: 16),
-                  _buildPlayerGrid(midfielders),
-                  const SizedBox(height: 24),
-                ],
-                if (forwards.isNotEmpty) ...[
-                  const Text(
-                    'FORWARDS',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildPlayerGrid(forwards),
-                ],
+                ),
               ],
-            ),
-          ),
+            );
+          },
         );
       },
       loading: () => const LoadingView(),
@@ -202,23 +175,12 @@ class PlayersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlayerGrid(List<Player> players) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.8,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: players.length,
-      itemBuilder: (context, index) {
-        final player = players[index];
-        return PlayerCard(
-          player: player,
-        );
-      },
-    );
+  Map<String, List<Player>> _groupPlayersByPosition(List<Player> players) {
+    return {
+      'Goalkeepers': players.where((p) => p.position == 'Goalkeeper').toList(),
+      'Defenders': players.where((p) => p.position == 'Defender').toList(),
+      'Midfielders': players.where((p) => p.position == 'Midfielder').toList(),
+      'Forwards': players.where((p) => p.position == 'Forward').toList(),
+    }..removeWhere((key, value) => value.isEmpty);
   }
 }

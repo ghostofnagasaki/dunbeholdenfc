@@ -3,7 +3,7 @@ description: "Dunbeholden"
 
 publish_to: 'none' 
 
-version: 1.1.0+2
+version: 1.2.3+7
 
 environment:
   sdk: ^3.5.0
@@ -38,6 +38,8 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   connectivity_plus: ^6.1.1
   flutter_local_notifications: ^17.2.1
+  firebase_performance: ^0.9.4+7
+  firebase_crashlytics: ^3.4.8
 
 dev_dependencies:
   flutter_test:
@@ -60,51 +62,11 @@ flutter:
     - assets/icons/google.png
     - assets/icons/facebook.png
     - assets/icons/dunbeholden.png
-    - assets/icons/dunbeholden_white.png
-    - assets/icons/waterhouse.png
-    - assets/icons/hvfc.png
-    - assets/icons/lhcc.png
-    - assets/icons/cavalier.png
-    - assets/icons/humble.png
     - assets/icons/db_circle.png
-    - assets/icons/premier_league_logo.png
-    - assets/icons/molynes.png
+  
 
   # images
-    - assets/images/d1.png
-    - assets/images/d2.png
-    - assets/images/150x150.png
     - assets/images/default_player.png
-    - assets/images/dunbeholden.png
-    - assets/images/arnett-gardens-fc-logo.png
-    - assets/images/home_jersey.png
-    - assets/images/home_jersey_back.png
-    - assets/images/3-3.png
-    - assets/images/charity-match.jpg
     - assets/images/shop_banner.jpg
 
-    # staff
-    - assets/staff/donavan-witter.jpg
-    - assets/staff/oneisho-goode.jpg
-    - assets/staff/vivian-matthews.jpg
-    - assets/staff/judith-drummond.jpg
-    - assets/staff/roger-simmonds.jpeg
-
-  # players
-    - assets/images/players/ajuma_johnson.jpg
-    - assets/images/players/chantomoi_taylor.jpg
-    - assets/images/players/chevoy_watkin.jpg
-    - assets/images/players/dean-andre_thomas.jpg
-    - assets/images/players/donovan_segree.jpg
-    - assets/images/players/dwight_merrick.jpg
-    - assets/images/players/fabion_maccarthy.jpg
-    - assets/images/players/fakibi_farquharson.jpg
-    - assets/images/players/gerald_jr_neil.jpg
-    - assets/images/players/leo_campbell.jpg
-    - assets/images/players/malachi_douglas.jpg
-    - assets/images/players/nakeel_wright.jpg
-    - assets/images/players/neron_barrow.jpg
-    - assets/images/players/ricardo_thomas.jpg
-    - assets/images/players/saneekie_burton.jpg
-    - assets/images/players/shakeen_powell.jpg
-    - assets/images/players/tyrese_gowe.jpg
+   

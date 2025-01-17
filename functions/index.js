@@ -4,6 +4,7 @@
 const admin = require('firebase-admin');
 const {onDocumentCreated} = require('firebase-functions/v2/firestore');
 const {logger} = require('firebase-functions');
+const functions = require('firebase-functions');
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -26,7 +27,7 @@ exports.sendNotificationOnNewPost = onDocumentCreated(
       // Prepare the notification message
       const message = {
         notification: {
-          title: 'New Post from Dunbeholden FC',
+          title: 'Dunbeholden FC',
           body: post.title || 'Check out our latest update!',
         },
         data: {
@@ -49,3 +50,36 @@ exports.sendNotificationOnNewPost = onDocumentCreated(
       }
     },
 );
+
+exports.sendPostNotification = functions.firestore
+  .document('posts/{postId}')
+  .onCreate(async (snap, context) => {
+    const post = snap.data();
+    
+    const message = {
+      notification: {
+        title: post.category === 'announcement' ? 'New Announcement' : 'New Post',
+        body: post.title,
+      },
+      data: {
+        postId: context.params.postId,
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+      },
+      topic: 'posts',
+      android: {
+        priority: 'high',
+        notification: {
+          channel_id: 'high_importance_channel',
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+          },
+        },
+      },
+    };
+
+    return admin.messaging().send(message);
+  });

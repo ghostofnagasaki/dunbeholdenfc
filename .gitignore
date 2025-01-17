@@ -123,3 +123,51 @@ app.*.map.json
 
 node_modules
 .vercel
+
+# Firebase config files
+google-services.json
+GoogleService-Info.plist
+
+# Other sensitive files
+key.properties
+upload-keystore.jks
+*.keystore
+*.jks
+
+# Firebase local config
+.firebase/
+firebase-debug.log
+
+# Firebase config and sensitive files
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/ios/firebase_app_id_file.json
+.firebaserc
+firebase.json
+**/lib/firebase_options.dart
+
+# Environment and config files
+.env
+.env.*
+**/android/local.properties
+**/android/key.properties
+
+# Keystore files
+*.jks
+*.keystore
+**/android/app/upload-keystore.jks
+**/android/app/debug.keystore
+
+# Firebase local files
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+
+# Build and generated files containing secrets
+**/android/app/build/
+**/ios/build/
+**/build/
+.dart_tool/

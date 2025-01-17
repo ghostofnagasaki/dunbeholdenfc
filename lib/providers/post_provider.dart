@@ -47,6 +47,7 @@ class Post {
   final String slug;
   final String status;
   final List<String> tags;
+  final String imageBlurHash;
 
   Post({
     required this.id,
@@ -62,6 +63,7 @@ class Post {
     required this.slug,
     required this.status,
     required this.tags,
+    required this.imageBlurHash,
   });
 
   Post copyWith({
@@ -93,6 +95,7 @@ class Post {
       slug: slug ?? this.slug,
       status: status ?? this.status,
       tags: tags ?? this.tags,
+      imageBlurHash: imageBlurHash,
     );
   }
 
@@ -112,6 +115,7 @@ class Post {
       slug: data['slug'] as String? ?? '',
       status: data['status'] as String? ?? 'draft',
       tags: List<String>.from(data['tags'] ?? []),
+      imageBlurHash: data['imageBlurHash'] as String? ?? '',
     );
   }
 }
