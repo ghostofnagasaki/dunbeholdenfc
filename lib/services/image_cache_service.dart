@@ -26,7 +26,7 @@ class ImageCacheService {
 
   static Future<void> clearCache() async {
     await customCacheManager.emptyCache();
-    imageCache?.clear();
-    imageCache?.clearLiveImages();
+    imageCache.clear();
+    imageCache.clearLiveImages();
   }
 } 

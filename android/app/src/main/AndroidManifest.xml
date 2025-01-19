@@ -52,7 +52,7 @@
             android:value="com.onesignal.example.NotificationServiceExtension" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="dunbeholden_channel"/>
+            android:value="high_importance_channel"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
