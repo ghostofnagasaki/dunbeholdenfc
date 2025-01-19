@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 import '../constants/colors.dart';
 import 'delete_account_screen.dart';
+import '../services/notification_service.dart';
+import 'notifications_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -48,6 +52,12 @@ class SettingsScreen extends ConsumerWidget {
                   'Notifications',
                   Icons.notifications_outlined,
                   showDivider: true,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationsScreen(),
+                    ),
+                  ),
                 ),
                 _buildSettingsItem(
                   context,
@@ -236,6 +246,49 @@ class _SocialIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(50),
       ),
       child: Icon(icon, color: Colors.white, size: 20),
+    );
+  }
+}
+
+class _NotificationSettings extends StatefulWidget {
+  @override
+  State<_NotificationSettings> createState() => _NotificationSettingsState();
+}
+
+class _NotificationSettingsState extends State<_NotificationSettings> {
+  late Future<bool> _notificationsEnabled;
+  final _notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationsEnabled = _notificationService.areNotificationsEnabled();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _notificationsEnabled,
+      builder: (context, snapshot) {
+        return ListTile(
+          title: const Text('Push Notifications'),
+          subtitle: const Text('Get updates about matches, news, and more'),
+          trailing: Switch(
+            value: snapshot.data ?? false,
+            onChanged: (bool value) async {
+              if (value) {
+                await _notificationService.requestPermissions();
+              } else {
+                // Open app settings to disable notifications
+                await openAppSettings();
+              }
+              setState(() {
+                _notificationsEnabled = _notificationService.areNotificationsEnabled();
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -20,20 +20,19 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 void main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+
+    // Initialize notifications early
+    final notificationService = NotificationService();
+    await notificationService.initialize();
 
     // More aggressive memory limits
     imageCache.maximumSize = 50;
     imageCache.maximumSizeBytes = 30 * 1024 * 1024;
 
     try {
-      await Firebase.initializeApp();
-      
       // Initialize Crashlytics
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-      
-      // Initialize notifications and request permissions
-      final notificationService = NotificationService();
-      await notificationService.initialize();
       
       // Catch errors that happen outside of Flutter
       PlatformDispatcher.instance.onError = (error, stack) {
@@ -82,12 +81,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _requestNotificationPermissions();
+    _checkNotifications();
   }
 
-  Future<void> _requestNotificationPermissions() async {
+  Future<void> _checkNotifications() async {
     if (widget.notificationService != null) {
-      await widget.notificationService!.requestPermissions();
+      await Future.delayed(const Duration(seconds: 1)); // Wait for app to settle
+      if (mounted) {
+        await widget.notificationService!.checkAndRequestPermissions(context);
+      }
     }
   }
 
