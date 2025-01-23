@@ -80,6 +80,26 @@ class NotificationService {
     }
   }
 
+  Future<void> initializeWithoutPermissionCheck() async {
+    debugPrint('Initializing NotificationService');
+    
+    // Configure notification channels for Android
+    await _configureAndroidChannel();
+    await _initializeLocalNotifications();
+
+    // Set up message handlers with debug logs
+    FirebaseMessaging.onMessage.listen((message) {
+      debugPrint('Received foreground message: ${message.toMap()}');
+      _handleForegroundMessage(message);
+    });
+    
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    
+    // Get FCM token and log it
+    final token = await _fcm.getToken();
+    debugPrint('FCM Token: $token');
+  }
+
   Future<void> requestPermissions() async {
     // Request permission with sound and badge
     final settings = await _fcm.requestPermission(
@@ -205,11 +225,11 @@ class NotificationService {
     await _fcm.subscribeToTopic('match_commentary');
   }
 
-  void _handleMessage(RemoteMessage message) {
-    if (message.data['postId'] != null) {
-      // Handle navigation to post
-    }
-  }
+  // void _handleMessage(RemoteMessage message) {
+  //   if (message.data['postId'] != null) {
+  //     // Handle navigation to post
+  //   }
+  // }
 
   Future<void> _showMatchCommentaryNotification({
     required String matchId,

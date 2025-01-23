@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 import 'widgets/custom_bottom_navigation_bar.dart';
 import 'screens/news_detail_screen.dart';
 import 'config/theme.dart';
+
+import 'screens/onboarding_screen.dart';
 
 import 'services/notification_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
@@ -20,26 +23,26 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 void main() async {
   await runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
 
-    // Initialize notifications early
+    // Check if this is first launch
+    final prefs = await SharedPreferences.getInstance();
+    final hasCompletedOnboarding = prefs.getBool('has_completed_onboarding') ?? false;
+
+    // Initialize Firebase
+    await Firebase.initializeApp();
+    
+    // Initialize Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    
+    // Initialize notifications without permission check
     final notificationService = NotificationService();
-    await notificationService.initialize();
+    await notificationService.initializeWithoutPermissionCheck();
 
     // More aggressive memory limits
     imageCache.maximumSize = 50;
     imageCache.maximumSizeBytes = 30 * 1024 * 1024;
 
     try {
-      // Initialize Crashlytics
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-      
-      // Catch errors that happen outside of Flutter
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
-
       // Warm up shaders before showing the app
       await ShaderWarmer.warmupShaders();
       
@@ -56,7 +59,13 @@ void main() async {
 
       runApp(
         ProviderScope(
-          child: MyApp(notificationService: notificationService),
+          child: MaterialApp(
+            title: 'Dunbeholden FC',
+            theme: AppTheme.theme,
+            home: hasCompletedOnboarding 
+                ? const MainScreen() 
+                : const OnboardingScreen(),
+          ),
         ),
       );
     } catch (e, stack) {
@@ -70,8 +79,9 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key, this.notificationService});
+  const MyApp({super.key, this.notificationService, this.initialRoute});
   final NotificationService? notificationService;
+  final String? initialRoute;
 
   @override
   State<MyApp> createState() => _MyAppState();

@@ -103,20 +103,20 @@ class SettingsScreen extends ConsumerWidget {
             _buildSection(
               'Danger Zone',
               [
-                _buildSettingsItem(
-                  context,
+            _buildSettingsItem(
+              context, 
                   'Delete Account',
                   Icons.delete_outline,
                   color: Colors.red,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DeleteAccountScreen(),
-                      ),
-                    );
-                  },
-                ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DeleteAccountScreen(),
+                  ),
+                );
+              },
+            ),
               ],
             ),
 
@@ -138,17 +138,17 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _SocialIcon(icon: Icons.facebook),
-                      SizedBox(width: 20),
-                      _SocialIcon(icon: FontAwesomeIcons.twitter),
-                      SizedBox(width: 20),
-                      _SocialIcon(icon: FontAwesomeIcons.instagram),
-                      SizedBox(width: 20),
-                      _SocialIcon(icon: FontAwesomeIcons.youtube),
-                      SizedBox(width: 20),
-                      _SocialIcon(icon: FontAwesomeIcons.tiktok),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _SocialIcon(icon: Icons.facebook),
+                  SizedBox(width: 20),
+                  _SocialIcon(icon: FontAwesomeIcons.twitter),
+                  SizedBox(width: 20),
+                  _SocialIcon(icon: FontAwesomeIcons.instagram),
+                  SizedBox(width: 20),
+                  _SocialIcon(icon: FontAwesomeIcons.youtube),
+                  SizedBox(width: 20),
+                  _SocialIcon(icon: FontAwesomeIcons.tiktok),
                     ],
                   ),
                 ],
@@ -202,20 +202,20 @@ class SettingsScreen extends ConsumerWidget {
       children: [
         ListTile(
           leading: Icon(icon, color: color),
-          title: Text(
-            title,
-            style: TextStyle(
+      title: Text(
+        title,
+        style: TextStyle(
               color: color,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          trailing: const Icon(
-            Icons.arrow_forward_ios,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
             color: Colors.white54,
-            size: 16,
-          ),
-          onTap: onTap ?? () {
+        size: 16,
+      ),
+      onTap: onTap ?? () {
             // Handle navigation
           },
         ),
