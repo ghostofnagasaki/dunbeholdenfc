@@ -126,15 +126,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Consumer(
       builder: (context, ref, _) {
         return ref.watch(postsStreamProvider).when(
-          data: (posts) {
-            if (posts.isEmpty) {
-              return _buildEmptyState();
-            }
+      data: (posts) {
+        if (posts.isEmpty) {
+          return _buildEmptyState();
+        }
 
-            final announcements = posts.where((post) => 
-              post.category.toLowerCase() == 'announcement').toList();
-            final otherPosts = posts.where((post) => 
-              post.category.toLowerCase() != 'announcement').toList();
+        final announcements = posts.where((post) => 
+          post.category.toLowerCase() == 'announcement').toList();
+        final otherPosts = posts.where((post) => 
+          post.category.toLowerCase() != 'announcement').toList();
 
             // Combine all posts into a single list
             final allPosts = [...announcements, ...otherPosts];
@@ -380,7 +380,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
       ),
     )
-  );
+    );
   }
 
   Widget _buildEmptyState() {

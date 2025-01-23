@@ -147,7 +147,7 @@ class _NotificationItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.darkBlue.withOpacity(0.1),
+            color: AppColors.darkBlue.withAlpha(26),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: AppColors.darkBlue),

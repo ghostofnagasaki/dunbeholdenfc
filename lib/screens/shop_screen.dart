@@ -79,7 +79,7 @@ class ShopScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed: _launchWebStore,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
                           foregroundColor: AppColors.primaryBlue,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 32,
@@ -112,8 +112,8 @@ class ShopScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Shop by Category',
-                    style: TextStyle(
-                      fontSize: 24,
+          style: TextStyle(
+            fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
