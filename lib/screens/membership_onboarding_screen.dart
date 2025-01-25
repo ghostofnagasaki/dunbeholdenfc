@@ -97,6 +97,7 @@ class MembershipOnboardingScreen extends StatelessWidget {
 
               // Price Section
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(25),
@@ -114,7 +115,7 @@ class MembershipOnboardingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      '\$5,000 JMD',
+                      '\$4,000 JMD',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 32,
