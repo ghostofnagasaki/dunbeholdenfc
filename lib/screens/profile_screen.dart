@@ -1,84 +1,367 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import '../providers/auth_provider.dart';
-// import '../providers/user_providers.dart';
-// import 'login_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../constants/app_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-// class ProfileScreen extends ConsumerWidget {
-//   const ProfileScreen({super.key});
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final authState = ref.watch(authProvider);
-//     final isAuthenticated = authState != null;
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
-//     if (!isAuthenticated) {
-//       return Center(
-//         child: ElevatedButton(
-//           onPressed: () {
-//             Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LoginScreen()));
-//           },
-//           child: const Text('Sign in to view your profile'),
-//         ),
-//       );
-//     }
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
 
-//     final userDetails = ref.watch(userProvider(authState.uid));
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Profile')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.account_circle_outlined,
+                size: 100,
+                color: AppColors.primary,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => _showMembershipSignIn(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Sign In with Membership Code'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Profile'),
-//         actions: [IconButton(icon: const Icon(Icons.settings), onPressed: () {})],
-//       ),
-//       body: userDetails.when(
-//         data: (user) => SingleChildScrollView(
-//           padding: const EdgeInsets.all(16),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Center(
-//                 child: Column(
-//                   children: [
-//                     CircleAvatar(
-//                       radius: 50,
-//                       backgroundColor: Colors.grey[300],
-//                       child: const Icon(Icons.person, size: 50, color: Colors.blue),
-//                     ),
-//                     const SizedBox(height: 8),
-//                     Text(user.name, style: Theme.of(context).textTheme.titleLarge),
-//                     Text(user.role, style: Theme.of(context).textTheme.bodySmall),
-//                   ],
-//                 ),
-//               ),
-//               const SizedBox(height: 24),
-//               _buildInfoField(context, 'Your Email', user.email, Icons.email),
-//               _buildInfoField(context, 'Password', '••••••••', Icons.lock),
-//             ],
-//           ),
-//         ),
-//         loading: () => const Center(child: CircularProgressIndicator()),
-//         error: (error, stack) => Center(child: Text('Error: $error')),
-//       ),
-//     );
-//   }
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('memberships')
+            .where('userId', isEqualTo: user.uid)
+            .limit(1)
+            .snapshots()
+            .map((snapshot) => snapshot.docs.first),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading profile'));
+          }
 
-//   Widget _buildInfoField(BuildContext context, String label, String value, IconData icon) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 8),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(label, style: Theme.of(context).textTheme.bodySmall),
-//           const SizedBox(height: 4),
-//           Row(
-//             children: [
-//               Icon(icon, size: 20, color: Colors.grey),
-//               const SizedBox(width: 8),
-//               Text(value, style: Theme.of(context).textTheme.titleMedium),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final membershipData = snapshot.data!.data() as Map<String, dynamic>;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoCard(
+                  title: 'Personal Information',
+                  children: [
+                    _buildInfoRow('Name', membershipData['fullName']),
+                    _buildInfoRow('Email', membershipData['email']),
+                    _buildInfoRow('Phone', membershipData['phone']),
+                    _buildInfoRow('Address', membershipData['address']),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                _buildInfoCard(
+                  title: 'Membership Details',
+                  children: [
+                    _buildInfoRow('Type', membershipData['membershipType']),
+                    _buildInfoRow('Status', membershipData['status']),
+                    _buildInfoRow('Code', membershipData['membershipCode']),
+                    _buildInfoRow(
+                      'Member Since',
+                      (membershipData['createdAt'] as Timestamp).toDate().toString().split(' ')[0],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showMembershipSignIn(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const MembershipSignInSheet(),
+    );
+  }
+}
+
+class MembershipSignInSheet extends StatefulWidget {
+  const MembershipSignInSheet({super.key});
+
+  @override
+  State<MembershipSignInSheet> createState() => _MembershipSignInSheetState();
+}
+
+class _MembershipSignInSheetState extends State<MembershipSignInSheet> {
+  final _codeController = TextEditingController();
+  bool _isLoading = false;
+  String? _error;
+
+  Future<void> _verifyCode() async {
+    final code = _codeController.text.toUpperCase();
+    if (code.length != 6) {
+      setState(() => _error = 'Please enter a valid 6-digit code');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('memberships')
+          .where('membershipCode', isEqualTo: code)
+          .limit(1)
+          .get();
+
+      if (!mounted) return;
+
+      if (snapshot.docs.isEmpty) {
+        setState(() => _error = 'Invalid membership code');
+        return;
+      }
+
+      // Close sheet and navigate to membership details
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MembershipDetailsScreen(
+            membershipId: snapshot.docs.first.id,
+          ),
+        ),
+      );
+    } catch (e) {
+      setState(() => _error = 'Error verifying code. Please try again.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        24 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Enter Membership Code',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Please enter your 6-digit membership code',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 24),
+          TextField(
+            controller: _codeController,
+            textCapitalization: TextCapitalization.characters,
+            maxLength: 6,
+            style: const TextStyle(letterSpacing: 8),
+            decoration: InputDecoration(
+              hintText: 'XXXXXX',
+              counterText: '',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorText: _error,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _verifyCode,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: _isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text('Verify Code'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    super.dispose();
+  }
+}
+
+class MembershipDetailsScreen extends StatelessWidget {
+  final String membershipId;
+
+  const MembershipDetailsScreen({
+    super.key,
+    required this.membershipId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Membership Details'),
+      ),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('memberships')
+            .doc(membershipId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading membership details'));
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final data = snapshot.data!.data() as Map<String, dynamic>;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoCard(
+                  title: 'Personal Information',
+                  children: [
+                    _buildInfoRow('Name', data['fullName']),
+                    _buildInfoRow('Email', data['email']),
+                    _buildInfoRow('Phone', data['phone']),
+                    _buildInfoRow('Address', data['address']),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                _buildInfoCard(
+                  title: 'Membership Details',
+                  children: [
+                    _buildInfoRow('Type', data['membershipType']),
+                    _buildInfoRow('Status', data['status']),
+                    _buildInfoRow('Code', data['membershipCode']),
+                    _buildInfoRow(
+                      'Member Since',
+                      (data['createdAt'] as Timestamp).toDate().toString().split(' ')[0],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

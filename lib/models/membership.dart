@@ -12,6 +12,7 @@ class Membership {
   final String status; // pending, approved, rejected
   final String membershipType; // standard, premium, etc.
   final String membershipCode; // New field
+  final String userId;  // Add this field to link with Firebase Auth
 
   Membership({
     required this.id,
@@ -24,6 +25,7 @@ class Membership {
     this.status = 'pending',
     required this.membershipType,
     required this.membershipCode,
+    required this.userId,
   });
 
   // Generate random 6-digit alphanumeric code
@@ -45,6 +47,7 @@ class Membership {
       'status': 'pending',  // Ensure status is always pending
       'membershipType': membershipType,
       'membershipCode': membershipCode,
+      'userId': userId,
     };
     print('Membership data being sent: $map'); // Debug print
     return map;

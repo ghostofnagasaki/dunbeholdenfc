@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/membership.dart';
 import '../repositories/membership_repository.dart';
@@ -22,6 +23,8 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
   final _addressController = TextEditingController();
   DateTime? _dateOfBirth;
   String _selectedMembershipType = 'standard';
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   @override
   void initState() {
@@ -48,8 +51,21 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
       setState(() => _isLoading = true);
       
       try {
+        print('Starting form submission...');
+        
+        // Create Auth account
+        print('Creating Firebase Auth account...');
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+        print('Auth account created successfully: ${userCredential.user?.uid}');
+
+        // Create membership
+        print('Creating membership document...');
         final membership = Membership(
           id: '',
+          userId: userCredential.user!.uid,
           fullName: _fullNameController.text,
           email: _emailController.text,
           phone: _phoneController.text,
@@ -60,7 +76,14 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
           membershipCode: Membership.generateMembershipCode(),
         );
 
+        print('Membership data: ${membership.toMap()}');
         await _repository.submitMembershipForm(membership);
+        print('Membership document created successfully');
+
+        // Update user profile
+        if (userCredential.user != null) {
+          await FirebaseAuth.instance.currentUser?.updateDisplayName(_fullNameController.text);
+        }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +94,11 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
           );
           Navigator.pop(context);
         }
-      } catch (e) {
+      } catch (e, stackTrace) {
+        print('Error during form submission:');
+        print('Error: $e');
+        print('Stack trace: $stackTrace');
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error submitting form: $e')),
@@ -95,29 +122,29 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Column(
+            child: Column(
                 children: [
                   // Header Section
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: const BorderRadius.only(
+                      borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(30),
                         bottomRight: Radius.circular(30),
                       ),
                     ),
                     child: const Column(
-                      children: [
+              children: [
                         Text(
                           'Become a Member',
-                          style: TextStyle(
+                  style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                         SizedBox(height: 8),
                         Text(
                           'Join our family and get exclusive benefits',
@@ -156,6 +183,35 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
+                            controller: _passwordController,
+                            label: 'Password',
+                            icon: Icons.lock_outline,
+                            obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a password';
+                              }
+                              if (value.length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
+                            controller: _confirmPasswordController,
+                            label: 'Confirm Password',
+                            icon: Icons.lock_outline,
+                            obscureText: true,
+                            validator: (value) {
+                              if (value != _passwordController.text) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          _buildInputField(
                             controller: _phoneController,
                             label: 'Phone',
                             icon: Icons.phone_outlined,
@@ -170,7 +226,7 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
                             controller: _addressController,
                             label: 'Address',
                             icon: Icons.location_on_outlined,
-                            maxLines: 3,
+                  maxLines: 3,
                             validator: (value) =>
                                 value?.isEmpty ?? true ? 'Please enter your address' : null,
                           ),
@@ -178,25 +234,25 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
                           _buildMembershipTypeSelector(),
                           const SizedBox(height: 32),
                           ElevatedButton(
-                            onPressed: _submitForm,
-                            style: ElevatedButton.styleFrom(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                            ),
-                            child: const Text(
+                    ),
+                    child: const Text(
                               'Submit Application',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ),
                   ),
                 ],
               ),
@@ -209,12 +265,14 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
     required String label,
     required IconData icon,
     TextInputType? keyboardType,
+    bool obscureText = false,
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      obscureText: obscureText,
       maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
@@ -229,7 +287,7 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary),
+          borderSide: const BorderSide(color: AppColors.primary),
         ),
         filled: true,
         fillColor: Colors.grey.shade50,
@@ -260,7 +318,7 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today_outlined, color: AppColors.primary),
+            const Icon(Icons.calendar_today_outlined, color: AppColors.primary),
             const SizedBox(width: 12),
             Text(
               _dateOfBirth == null
@@ -287,7 +345,7 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<String>(
           value: _selectedMembershipType,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             prefixIcon: Icon(Icons.card_membership, color: AppColors.primary),
             border: InputBorder.none,
           ),
@@ -317,6 +375,8 @@ class _MembershipFormScreenState extends State<MembershipFormScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 } 
