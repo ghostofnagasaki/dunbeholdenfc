@@ -30,7 +30,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   video_player: ^2.2.19
   font_awesome_flutter: ^10.1.0
-  shared_preferences: ^2.3.5
+  shared_preferences: ^2.4.0
   flutter_launcher_icons: ^0.14.3
   url_launcher: ^6.1.14
   

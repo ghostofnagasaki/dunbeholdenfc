@@ -12,13 +12,11 @@ import 'widgets/custom_bottom_navigation_bar.dart';
 import 'screens/news_detail_screen.dart';
 import 'config/theme.dart';
 
-import 'screens/onboarding_screen.dart';
 
 import 'services/notification_service.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'services/image_cache_service.dart';
 import 'services/shader_warmer.dart';
-import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 const bool debug = !kReleaseMode;
@@ -29,8 +27,7 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp();
 
-  // Enable persistence
-  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+
   
   // Check if this is first launch
   final prefs = await SharedPreferences.getInstance();
