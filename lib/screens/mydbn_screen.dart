@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import '../constants/colors.dart';
 import '../constants/styles.dart';
 import '../widgets/benefit_item.dart';
 import '../screens/membership_onboarding_screen.dart';
 
+import '../screens/membership_form_screen.dart';
+import '../widgets/sign_in_sheet.dart';
+
 class MyDBNScreen extends ConsumerWidget {
   const MyDBNScreen({super.key});
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,7 +28,6 @@ class MyDBNScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: true,
-        
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -56,7 +56,7 @@ class MyDBNScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             // Sign Up Card
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -92,15 +92,18 @@ class MyDBNScreen extends ConsumerWidget {
                       const SizedBox(height: 30),
                       ElevatedButton(
                         onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MembershipOnboardingScreen()),
-                );
-              },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const MembershipOnboardingScreen()),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primaryBlue,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -111,6 +114,26 @@ class MyDBNScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _showSignInSheet(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.primaryBlue,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'LOG IN',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -141,10 +164,34 @@ class MyDBNScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 32),
 
-          
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MembershipFormScreen(),
+                ),
+              ),
+              child: const Text(
+                'Not a member? Join now',
+                style: TextStyle(
+                  color: AppColors.primaryBlue,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showSignInSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const SignInSheet(),
     );
   }
 

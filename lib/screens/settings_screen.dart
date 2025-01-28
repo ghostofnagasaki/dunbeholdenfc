@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -8,6 +10,7 @@ import '../constants/colors.dart';
 import 'delete_account_screen.dart';
 import '../services/notification_service.dart';
 import 'notifications_screen.dart';
+import 'profile_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -46,6 +49,12 @@ class SettingsScreen extends ConsumerWidget {
                   'Profile',
                   Icons.person_outline,
                   showDivider: true,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                  ),
                 ),
                 _buildSettingsItem(
                   context,
@@ -63,6 +72,18 @@ class SettingsScreen extends ConsumerWidget {
                   context,
                   'Privacy',
                   Icons.lock_outline,
+                ),
+                _buildSettingsItem(
+                  context,
+                  'Sign Out',
+                  Icons.logout,
+                  color: Colors.red,
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    if (context.mounted) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
                 ),
               ],
             ),
@@ -90,11 +111,29 @@ class SettingsScreen extends ConsumerWidget {
                   'Terms of Service',
                   Icons.description_outlined,
                   showDivider: true,
+                  onTap: () async {
+                    final url = Uri.parse('https://sites.google.com/view/dunbeholden-terms-of-service/home');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
                 ),
                 _buildSettingsItem(
                   context,
                   'Privacy Policy',
                   Icons.privacy_tip_outlined,
+                  onTap: () async {
+                    final url = Uri.parse('https://sites.google.com/view/dunbeholden-privacy-policy/home');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
                 ),
               ],
             ),
