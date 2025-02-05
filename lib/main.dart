@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'widgets/custom_bottom_navigation_bar.dart';
@@ -19,6 +18,7 @@ import 'services/image_cache_service.dart';
 import 'services/shader_warmer.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+
 const bool debug = !kReleaseMode;
 
 void main() async {
@@ -26,6 +26,7 @@ void main() async {
   
   // Initialize Firebase
   await Firebase.initializeApp();
+
 
 
   
@@ -45,11 +46,11 @@ void main() async {
   imageCache.maximumSizeBytes = 30 * 1024 * 1024;
 
   // Initialize Firebase App Check
-  await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug,
-    appleProvider: AppleProvider.debug,
-    webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
-  );
+  // await FirebaseAppCheck.instance.activate(
+  //   androidProvider: AndroidProvider.debug,
+  //   appleProvider: AppleProvider.debug,
+  //   webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+  // );
 
   try {
     // Warm up shaders before showing the app

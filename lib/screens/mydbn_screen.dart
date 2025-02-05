@@ -6,8 +6,9 @@ import '../constants/styles.dart';
 import '../widgets/benefit_item.dart';
 import '../screens/membership_onboarding_screen.dart';
 
-import '../screens/membership_form_screen.dart';
-import '../widgets/sign_in_sheet.dart';
+import '../screens/auth_screen.dart';
+
+import '../widgets/auth_sheet.dart';
 
 class MyDBNScreen extends ConsumerWidget {
   const MyDBNScreen({super.key});
@@ -90,52 +91,67 @@ class MyDBNScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const MembershipOnboardingScreen()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primaryBlue,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) =>
+                      //               const MembershipOnboardingScreen()),
+                      //     );
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.white,
+                      //     foregroundColor: AppColors.primaryBlue,
+                      //     padding: const EdgeInsets.symmetric(
+                      //         horizontal: 32, vertical: 16),
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //     ),
+                      //     elevation: 0,
+                      //   ),
+                      //   child: const Text(
+                      //     'SIGN FOR DUNBEHOLDEN',
+                      //     style: TextStyle(
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
+                      // ),
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _showAuthSheet(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: AppColors.primaryBlue,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 32, vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              'SIGN FOR DUNBEHOLDEN',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'SIGN FOR DUNBEHOLDEN',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () => _showAuthSheet(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              'Already a member? Log in',
+                              style: TextStyle(fontSize: 14),
+                            ),
                           ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _showSignInSheet(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primaryBlue,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'LOG IN',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
@@ -168,9 +184,7 @@ class MyDBNScreen extends ConsumerWidget {
             TextButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const MembershipFormScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const AuthScreen()),
               ),
               child: const Text(
                 'Not a member? Join now',
@@ -186,12 +200,12 @@ class MyDBNScreen extends ConsumerWidget {
     );
   }
 
-  void _showSignInSheet(BuildContext context) {
+  void _showAuthSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const SignInSheet(),
+      builder: (context) => const AuthSheet(isSignUp: true),
     );
   }
 

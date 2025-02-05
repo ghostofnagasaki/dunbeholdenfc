@@ -2,10 +2,41 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Helper functions
-    function isAdmin() {
-      return exists(/databases/$(database)/documents/admin_users/$(request.auth.uid));
+    function isSignedIn() {
+      return request.auth != null;
     }
     
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function emailVerified() {
+      return request.auth.token.email_verified;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Allow reading own profile
+      allow read: if isOwner(userId);
+      
+      // Allow creation only during signup
+      allow create: if isSignedIn() 
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasAll(['firstName', 'lastName', 'email', 'dateOfBirth', 'age', 'country'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.uid == userId;
+      
+      // Allow updates to own profile with restrictions
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['firstName', 'lastName', 'country', 'updatedAt'])
+        && !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['email', 'uid', 'createdAt', 'emailVerified']);
+      
+      // Never allow deletion
+      allow delete: if false;
+    }
+
     // Admin users collection
     match /admin_users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;

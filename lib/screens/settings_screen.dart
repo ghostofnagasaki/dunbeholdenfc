@@ -65,9 +65,9 @@ class SettingsScreen extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const NotificationsScreen(),
-                    ),
-                  ),
                 ),
+              ),
+            ),
                 _buildSettingsItem(
                   context,
                   'Privacy',

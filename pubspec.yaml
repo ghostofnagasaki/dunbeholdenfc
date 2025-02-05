@@ -12,11 +12,13 @@ dependencies:
   flutter:
     sdk: flutter
   firebase_core: ^3.10.1
-  firebase_auth: ^5.4.1
+  firebase_auth: 5.4.1
   cloud_firestore: ^5.6.2
   firebase_storage: ^12.4.1
   firebase_messaging: ^15.2.1
   flutter_riverpod: ^2.3.6
+  firebase_performance: ^0.10.1+1
+  firebase_crashlytics: ^4.3.1
   
   cached_network_image: ^3.3.1
   sqflite: ^2.3.2
@@ -38,9 +40,7 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   connectivity_plus: ^6.1.1
   flutter_local_notifications: ^18.0.1
-  firebase_performance: ^0.10.1+1
-  firebase_crashlytics: ^4.3.1
-  firebase_app_check: ^0.3.2+1
+  
 
 dev_dependencies:
   flutter_test:
@@ -69,5 +69,6 @@ flutter:
   # images
     - assets/images/default_player.png
     - assets/images/shop_banner.jpg
+  
 
    
