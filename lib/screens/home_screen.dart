@@ -6,7 +6,6 @@ import '../constants/colors.dart';
 import '../services/performance_monitor.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'settings_screen.dart';
 import '../widgets/optimized_card.dart';
 import '../widgets/loading_view.dart';
 import '../widgets/error_view.dart';
@@ -96,20 +95,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           'assets/icons/dunbeholden.png',
           height: 40,
           fit: BoxFit.contain,
-          color: Colors.white,
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            icon: const Icon(Icons.settings, color: Colors.white),
-          ),
-          const SizedBox(width: 10),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        //       );
+        //     },
+        //     icon: const Icon(Icons.settings, color: Colors.white),
+        //   ),
+        //   const SizedBox(width: 10),
+        // ],
       ),
       body: RefreshIndicator(
         onRefresh: () => PerformanceMonitor.trackOperation(
@@ -126,42 +124,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Consumer(
       builder: (context, ref, _) {
         return ref.watch(postsStreamProvider).when(
-      data: (posts) {
-        if (posts.isEmpty) {
-          return _buildEmptyState();
-        }
+              data: (posts) {
+                if (posts.isEmpty) {
+                  return _buildEmptyState();
+                }
 
-        final announcements = posts.where((post) => 
-          post.category.toLowerCase() == 'announcement').toList();
-        final otherPosts = posts.where((post) => 
-          post.category.toLowerCase() != 'announcement').toList();
+                final announcements = posts
+                    .where(
+                        (post) => post.category.toLowerCase() == 'announcement')
+                    .toList();
+                final otherPosts = posts
+                    .where(
+                        (post) => post.category.toLowerCase() != 'announcement')
+                    .toList();
 
-            // Combine all posts into a single list
-            final allPosts = [...announcements, ...otherPosts];
+                // Combine all posts into a single list
+                final allPosts = [...announcements, ...otherPosts];
 
-            return ListView.builder(
-              itemCount: allPosts.length,
-              cacheExtent: 1000,
-              addAutomaticKeepAlives: false,
-              addRepaintBoundaries: true,
-              itemBuilder: (context, index) {
-                final post = allPosts[index];
-                return RepaintBoundary(
-                  child: index < announcements.length
-                    ? _buildAnnouncementCard(context, post)
-                    : OptimizedCard(
-                        child: _buildRegularPostCard(context, post),
-                      ),
+                return ListView.builder(
+                  itemCount: allPosts.length,
+                  cacheExtent: 1000,
+                  addAutomaticKeepAlives: false,
+                  addRepaintBoundaries: true,
+                  itemBuilder: (context, index) {
+                    final post = allPosts[index];
+                    return RepaintBoundary(
+                      child: index < announcements.length
+                          ? _buildAnnouncementCard(context, post)
+                          : OptimizedCard(
+                              child: _buildRegularPostCard(context, post),
+                            ),
+                    );
+                  },
                 );
               },
+              loading: () => const LoadingView(),
+              error: (error, stack) => ErrorView(
+                message: error.toString(),
+                onRetry: () => ref.refresh(postsStreamProvider),
+              ),
             );
-          },
-          loading: () => const LoadingView(),
-          error: (error, stack) => ErrorView(
-            message: error.toString(),
-            onRetry: () => ref.refresh(postsStreamProvider),
-          ),
-        );
       },
     );
   }
@@ -289,98 +291,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildRegularPostCard(BuildContext context, Post post) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(
-        context,
-        '/news-detail',
-        arguments: post.id,
-      ),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withAlpha(26),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
+        onTap: () => Navigator.pushNamed(
+              context,
+              '/news-detail',
+              arguments: post.id,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (post.image.isNotEmpty)
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: CachedNetworkImage(
-                  imageUrl: post.image,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  memCacheWidth: 800,
-                  fadeInDuration: const Duration(milliseconds: 300),
-                  placeholder: (context, url) => Container(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withAlpha(26),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (post.image.isNotEmpty)
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: CachedNetworkImage(
+                    imageUrl: post.image,
                     height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 48,
-                        color: Colors.grey[300],
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    memCacheWidth: 800,
+                    fadeInDuration: const Duration(milliseconds: 300),
+                    placeholder: (context, url) => Container(
+                      height: 200,
+                      color: Colors.grey[100],
+                      child: Center(
+                        child: Icon(
+                          Icons.image,
+                          size: 48,
+                          color: Colors.grey[300],
+                        ),
                       ),
                     ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: Colors.grey[100],
-                    child: Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.grey[300],
+                    errorWidget: (context, url, error) => Container(
+                      height: 200,
+                      color: Colors.grey[100],
+                      child: Center(
+                        child: Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.grey[300],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Men's Team • ${_formatDate(post.date)}",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryBlue,
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "Men's Team • ${_formatDate(post.date)}",
+                          style:
+                              TextStyle(color: Colors.grey[600], fontSize: 12),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    post.summary,
-                    style: TextStyle(color: Colors.grey[800]),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      post.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      post.summary,
+                      style: TextStyle(color: Colors.grey[800]),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-          ],
-      ),
-    )
-    );
+            ],
+          ),
+        ));
   }
 
   Widget _buildEmptyState() {

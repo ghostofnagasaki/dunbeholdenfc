@@ -10,7 +10,7 @@ import '../constants/colors.dart';
 import 'delete_account_screen.dart';
 import '../services/notification_service.dart';
 import 'notifications_screen.dart';
-import 'profile_screen.dart';
+// import 'profile_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -39,23 +39,23 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-            
+
             // Account Section
             _buildSection(
               'Account',
               [
-                _buildSettingsItem(
-                  context,
-                  'Profile',
-                  Icons.person_outline,
-                  showDivider: true,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  ),
-                ),
+                // _buildSettingsItem(
+                //   context,
+                //   'Profile',
+                //   Icons.person_outline,
+                //   showDivider: true,
+                //   onTap: () => Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => const ProfileScreen(),
+                //     ),
+                //   ),
+                // ),
                 _buildSettingsItem(
                   context,
                   'Notifications',
@@ -68,11 +68,12 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                _buildSettingsItem(
-                  context,
-                  'Privacy',
-                  Icons.lock_outline,
-                ),
+                // _buildSettingsItem(
+                //   context,
+                //   'Privacy',
+                //   Icons.lock_outline,
+                //   showDivider: true
+                // ),
                 _buildSettingsItem(
                   context,
                   'Sign Out',
@@ -87,8 +88,6 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-
-            
 
             // Support Section
             _buildSection(
@@ -112,7 +111,8 @@ class SettingsScreen extends ConsumerWidget {
                   Icons.description_outlined,
                   showDivider: true,
                   onTap: () async {
-                    final url = Uri.parse('https://sites.google.com/view/dunbeholden-terms-of-service/home');
+                    final url = Uri.parse(
+                        'https://sites.google.com/view/dunbeholden-terms-of-service/home');
                     if (await canLaunchUrl(url)) {
                       await launchUrl(
                         url,
@@ -126,7 +126,8 @@ class SettingsScreen extends ConsumerWidget {
                   'Privacy Policy',
                   Icons.privacy_tip_outlined,
                   onTap: () async {
-                    final url = Uri.parse('https://sites.google.com/view/dunbeholden-privacy-policy/home');
+                    final url = Uri.parse(
+                        'https://sites.google.com/view/dunbeholden-privacy-policy/home');
                     if (await canLaunchUrl(url)) {
                       await launchUrl(
                         url,
@@ -142,20 +143,20 @@ class SettingsScreen extends ConsumerWidget {
             _buildSection(
               'Danger Zone',
               [
-            _buildSettingsItem(
-              context, 
+                _buildSettingsItem(
+                  context,
                   'Delete Account',
                   Icons.delete_outline,
                   color: Colors.red,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DeleteAccountScreen(),
-                  ),
-                );
-              },
-            ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DeleteAccountScreen(),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
 
@@ -177,17 +178,17 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: 16),
                   Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _SocialIcon(icon: Icons.facebook),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.twitter),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.instagram),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.youtube),
-                  SizedBox(width: 20),
-                  _SocialIcon(icon: FontAwesomeIcons.tiktok),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _SocialIcon(icon: Icons.facebook),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.twitter),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.instagram),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.youtube),
+                      SizedBox(width: 20),
+                      _SocialIcon(icon: FontAwesomeIcons.tiktok),
                     ],
                   ),
                 ],
@@ -241,22 +242,23 @@ class SettingsScreen extends ConsumerWidget {
       children: [
         ListTile(
           leading: Icon(icon, color: color),
-      title: Text(
-        title,
-        style: TextStyle(
+          title: Text(
+            title,
+            style: TextStyle(
               color: color,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
             color: Colors.white54,
-        size: 16,
-      ),
-      onTap: onTap ?? () {
-            // Handle navigation
-          },
+            size: 16,
+          ),
+          onTap: onTap ??
+              () {
+                // Handle navigation
+              },
         ),
         if (showDivider)
           Divider(
@@ -267,8 +269,6 @@ class SettingsScreen extends ConsumerWidget {
       ],
     );
   }
-
-
 }
 
 class _SocialIcon extends StatelessWidget {
@@ -322,7 +322,8 @@ class _NotificationSettingsState extends State<_NotificationSettings> {
                 await openAppSettings();
               }
               setState(() {
-                _notificationsEnabled = _notificationService.areNotificationsEnabled();
+                _notificationsEnabled =
+                    _notificationService.areNotificationsEnabled();
               });
             },
           ),
