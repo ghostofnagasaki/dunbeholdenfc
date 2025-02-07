@@ -1,3 +1,4 @@
+import 'package:dunbeholden/screens/user_profile_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/colors.dart';
@@ -5,7 +6,6 @@ import '../screens/home_screen.dart';
 import '../screens/matches_screen.dart';
 import '../screens/shop_screen.dart';
 
-import '../screens/mydbn_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -21,7 +21,7 @@ class MainScreenState extends ConsumerState<MainScreen> {
     const HomeScreen(),
     const MatchesScreen(),
     const ShopScreen(),
-    const MyDBNScreen(),
+    AuthCheck(),
   ];
 
   @override
@@ -49,14 +49,18 @@ class MainScreenState extends ConsumerState<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              _currentIndex == 1 ? Icons.sports_soccer : Icons.sports_soccer_outlined,
+              _currentIndex == 1
+                  ? Icons.sports_soccer
+                  : Icons.sports_soccer_outlined,
               weight: 0.5,
             ),
             label: 'Matches',
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              _currentIndex == 2 ? Icons.shopping_bag : Icons.shopping_bag_outlined,
+              _currentIndex == 2
+                  ? Icons.shopping_bag
+                  : Icons.shopping_bag_outlined,
               weight: 0.5,
             ),
             label: 'Store',

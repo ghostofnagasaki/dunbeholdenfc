@@ -2,12 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../constants/app_colors.dart';
+import '../screens/user_screen.dart';
 
 export 'auth_sheet.dart';
 
 class AuthSheet extends StatefulWidget {
   final bool isSignUp;
-  
+
   const AuthSheet({
     super.key,
     this.isSignUp = false,
@@ -19,7 +20,7 @@ class AuthSheet extends StatefulWidget {
 
 class _AuthSheetState extends State<AuthSheet> {
   bool _isLoading = false;
-  
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -32,7 +33,7 @@ class _AuthSheetState extends State<AuthSheet> {
 
   // Add form key
   final _formKey = GlobalKey<FormState>();
-  
+
   // Add validation states
   bool _emailTouched = false;
   bool _passwordTouched = false;
@@ -41,7 +42,7 @@ class _AuthSheetState extends State<AuthSheet> {
   int _calculateAge(DateTime birthDate) {
     final today = DateTime.now();
     int age = today.year - birthDate.year;
-    if (today.month < birthDate.month || 
+    if (today.month < birthDate.month ||
         (today.month == birthDate.month && today.day < birthDate.day)) {
       age--;
     }
@@ -70,7 +71,7 @@ class _AuthSheetState extends State<AuthSheet> {
   // Email validation
   String? _validateEmail(String? value) {
     if (!_emailTouched) return null;
-    
+
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
@@ -83,7 +84,7 @@ class _AuthSheetState extends State<AuthSheet> {
   // Password validation with immediate feedback
   String? _validatePasswordField(String? value) {
     if (!_passwordTouched) return null;
-    
+
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
@@ -93,7 +94,7 @@ class _AuthSheetState extends State<AuthSheet> {
   // Confirm password validation
   String? _validateConfirmPassword(String? value) {
     if (!_confirmPasswordTouched) return null;
-    
+
     if (value == null || value.isEmpty) {
       return 'Please confirm your password';
     }
@@ -130,10 +131,10 @@ class _AuthSheetState extends State<AuthSheet> {
       return;
     }
 
-    if (_emailController.text.isEmpty || 
-        _firstNameController.text.isEmpty || 
-        _lastNameController.text.isEmpty || 
-        _dateOfBirth == null || 
+    if (_emailController.text.isEmpty ||
+        _firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _dateOfBirth == null ||
         _selectedCountry == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
@@ -144,7 +145,8 @@ class _AuthSheetState extends State<AuthSheet> {
     final age = _calculateAge(_dateOfBirth!);
     if (age < 13) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be at least 13 years old to sign up')),
+        const SnackBar(
+            content: Text('You must be at least 13 years old to sign up')),
       );
       return;
     }
@@ -152,7 +154,8 @@ class _AuthSheetState extends State<AuthSheet> {
     setState(() => _isLoading = true);
 
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
@@ -163,18 +166,18 @@ class _AuthSheetState extends State<AuthSheet> {
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({
-            'uid': userCredential.user!.uid,
-            'firstName': _firstNameController.text.trim(),
-            'lastName': _lastNameController.text.trim(),
-            'email': _emailController.text.trim(),
-            'dateOfBirth': _dateOfBirth,
-            'age': age,
-            'country': _selectedCountry,
-            'createdAt': FieldValue.serverTimestamp(),
-            'updatedAt': FieldValue.serverTimestamp(),
-            'isActive': true,
-            'emailVerified': false,
-          });
+        'uid': userCredential.user!.uid,
+        'firstName': _firstNameController.text.trim(),
+        'lastName': _lastNameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'dateOfBirth': _dateOfBirth,
+        'age': age,
+        'country': _selectedCountry,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'isActive': true,
+        'emailVerified': false,
+      });
 
       await showDialog(
         context: context,
@@ -196,10 +199,12 @@ class _AuthSheetState extends State<AuthSheet> {
           ],
         ),
       );
+
+      // _checkLoginStatus();
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         String message = 'An error occurred';
-        
+
         switch (e.code) {
           case 'email-already-in-use':
             message = 'This email is already registered';
@@ -213,7 +218,7 @@ class _AuthSheetState extends State<AuthSheet> {
           default:
             message = e.message ?? 'An error occurred';
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message)),
         );
@@ -226,6 +231,21 @@ class _AuthSheetState extends State<AuthSheet> {
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _checkLoginStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => UserProfileScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User is not logged in")),
+      );
     }
   }
 
@@ -255,7 +275,6 @@ class _AuthSheetState extends State<AuthSheet> {
                 ),
               ),
             ),
-            
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
@@ -292,14 +311,17 @@ class _AuthSheetState extends State<AuthSheet> {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         border: const OutlineInputBorder(),
-                        helperText: 
+                        helperText:
                             'Must contain at least 8 characters, uppercase, lowercase, number and special character',
                         helperMaxLines: 2,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       obscureText: _obscurePassword,
@@ -319,9 +341,13 @@ class _AuthSheetState extends State<AuthSheet> {
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                            _obscureConfirmPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
-                          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                          onPressed: () => setState(() =>
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword),
                         ),
                       ),
                       obscureText: _obscureConfirmPassword,
@@ -382,18 +408,25 @@ class _AuthSheetState extends State<AuthSheet> {
                         labelText: 'Country',
                         border: OutlineInputBorder(),
                       ),
-                      items: ['Jamaica', 'United States', 'Canada', 'United Kingdom', 'Other']
+                      items: [
+                        'Jamaica',
+                        'United States',
+                        'Canada',
+                        'United Kingdom',
+                        'Other'
+                      ]
                           .map((country) => DropdownMenuItem(
                                 value: country,
                                 child: Text(country),
                               ))
                           .toList(),
-                      onChanged: (value) => setState(() => _selectedCountry = value),
+                      onChanged: (value) =>
+                          setState(() => _selectedCountry = value),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: _isLoading 
-                          ? null 
+                      onPressed: _isLoading
+                          ? null
                           : () {
                               if (_formKey.currentState?.validate() ?? false) {
                                 _submitSignUp();
@@ -409,7 +442,8 @@ class _AuthSheetState extends State<AuthSheet> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
                           : const Text('Sign Up'),
@@ -433,4 +467,4 @@ class _AuthSheetState extends State<AuthSheet> {
     _lastNameController.dispose();
     super.dispose();
   }
-} 
+}

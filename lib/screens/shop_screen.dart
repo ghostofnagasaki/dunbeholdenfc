@@ -7,7 +7,8 @@ class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
 
   Future<void> _launchWebStore() async {
-    const url = 'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071';
+    const url =
+        'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071';
     if (!await launchUrl(Uri.parse(url))) {
       throw Exception('Could not launch $url');
     }
@@ -76,24 +77,27 @@ class ShopScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: _launchWebStore,
-                        style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primaryBlue,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _launchWebStore,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primaryBlue,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Shop Now',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                          child: const Text(
+                            'Shop Now',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
@@ -112,8 +116,8 @@ class ShopScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Shop by Category',
-          style: TextStyle(
-            fontSize: 24,
+                    style: TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -128,7 +132,8 @@ class ShopScreen extends StatelessWidget {
                         'Home, Away & Third Kits 23/24',
                         Icons.sports_hockey,
                         context,
-                        url: 'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071',
+                        url:
+                            'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071',
                       ),
                       _buildCategoryTile(
                         'Training',
@@ -159,7 +164,8 @@ class ShopScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ElevatedButton(
-                onPressed: () => _launchUrl('https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071'),
+                onPressed: () => _launchUrl(
+                    'https://admiral-sports.com/shop/usa_en/jersey-short-sleeve-custom-sublimated-1?xid=131071'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppColors.primaryBlue,

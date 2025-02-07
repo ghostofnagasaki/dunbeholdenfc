@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.9.22'
+    ext.kotlin_version = '2.1.0'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.0'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
@@ -35,6 +35,6 @@ tasks.register("clean", Delete) {
 
 configurations.all {
     resolutionStrategy {
-        force 'org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0' // Force the correct version
+        force 'org.jetbrains.kotlinx:kotlinx-metadata-jvm:1.9.0' // Force the correct version
     }
 }

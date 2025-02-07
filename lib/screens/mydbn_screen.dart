@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/colors.dart';
 import '../constants/styles.dart';
 import '../widgets/benefit_item.dart';
-import '../screens/membership_onboarding_screen.dart';
 
 import '../screens/auth_screen.dart';
 
 import '../widgets/auth_sheet.dart';
+import 'settings_screen.dart';
 
 class MyDBNScreen extends ConsumerWidget {
   const MyDBNScreen({super.key});
@@ -29,6 +29,18 @@ class MyDBNScreen extends ConsumerWidget {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            icon: const Icon(Icons.settings, color: Colors.white),
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -141,16 +153,16 @@ class MyDBNScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          TextButton(
-                            onPressed: () => _showAuthSheet(context),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text(
-                              'Already a member? Log in',
-                              style: TextStyle(fontSize: 14),
-                            ),
-                          ),
+                          // TextButton(
+                          //   onPressed: () => _showAuthSheet(context),
+                          //   style: TextButton.styleFrom(
+                          //     foregroundColor: Colors.white,
+                          //   ),
+                          //   child: const Text(
+                          //     'Already a member? Log in',
+                          //     style: TextStyle(fontSize: 14),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
