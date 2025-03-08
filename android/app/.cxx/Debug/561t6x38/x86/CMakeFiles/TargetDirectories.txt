@@ -1,0 +1,2 @@
+C:/Users/Nagasaki/Documents/GitHub/dunbeholdenfc/android/app/.cxx/Debug/561t6x38/x86/CMakeFiles/edit_cache.dir
+C:/Users/Nagasaki/Documents/GitHub/dunbeholdenfc/android/app/.cxx/Debug/561t6x38/x86/CMakeFiles/rebuild_cache.dir
